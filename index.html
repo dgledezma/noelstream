@@ -110,6 +110,15 @@
             box-shadow: 0 0 25px -5px rgba(212, 175, 55, 0.35);
         }
 
+        /* Ocultar scrollbar en pestañas horizontales móviles manteniendo el deslizamiento */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         @keyframes snowFall {
             0% { transform: translateY(-10px) translateX(0); opacity: 0; }
             20% { opacity: 0.4; }
@@ -125,7 +134,7 @@
         }
     </style>
 </head>
-<body class="festive-bg text-stone-100 font-sans h-screen overflow-hidden flex flex-col select-none">
+<body class="festive-bg text-stone-100 font-sans h-[100dvh] overflow-hidden flex flex-col select-none">
 
     <!-- Copos de nieve decorativos -->
     <div id="snow-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
@@ -138,63 +147,85 @@
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
     <!-- Indicador de Carga / Buffering de Streaming desde Drive -->
-    <div id="stream-loading-banner" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 glass-panel border border-gold-400/50 px-4 py-2 rounded-full shadow-2xl items-center gap-2.5 text-xs text-gold-300 font-medium">
-        <div class="w-3.5 h-3.5 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
-        <span id="stream-loading-text">Cargando stream desde Google Drive...</span>
+    <div id="stream-loading-banner" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-50 glass-panel border border-gold-400/50 px-4 py-2 rounded-full shadow-2xl items-center gap-2.5 text-xs text-gold-300 font-medium whitespace-nowrap">
+        <div class="w-3.5 h-3.5 border-2 border-gold-400 border-t-transparent rounded-full animate-spin shrink-0"></div>
+        <span id="stream-loading-text" class="truncate max-w-[75vw]">Cargando stream desde Google Drive...</span>
     </div>
 
-    <!-- CABECERA PRINCIPAL (Móvil + PC) -->
-    <header class="relative z-20 glass-panel border-b border-gold-500/20 px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 shrink-0">
-        <div class="flex items-center gap-2.5 min-w-0">
-            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-crimson-600 to-pine-800 p-0.5 gold-glow flex items-center justify-center shrink-0">
-                <div class="w-full h-full bg-pine-950/90 rounded-[10px] flex items-center justify-center text-gold-400">
-                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+    <!-- CABECERA PRINCIPAL (2 filas limpias en Móvil, 1 fila en PC - Sin superposiciones) -->
+    <header class="relative z-20 glass-panel border-b border-gold-500/20 px-3 sm:px-5 py-2.5 flex flex-col md:flex-row md:items-center md:justify-between gap-2.5 shrink-0">
+        
+        <!-- Fila 1 en Móvil: Logo + Estado a la izquierda, Botones de Acción a la derecha -->
+        <div class="flex items-center justify-between gap-2 w-full md:w-auto">
+            <div class="flex items-center gap-2 min-w-0">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-crimson-600 to-pine-800 p-0.5 gold-glow flex items-center justify-center shrink-0">
+                    <div class="w-full h-full bg-pine-950/90 rounded-[10px] flex items-center justify-center text-gold-400">
+                        <i data-lucide="sparkles" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                    </div>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                        <h1 class="font-serif text-base sm:text-xl font-bold tracking-wide bg-gradient-to-r from-stone-100 via-gold-300 to-gold-500 bg-clip-text text-transparent truncate">
+                            NoelStream
+                        </h1>
+                        <span id="connection-badge" class="text-[9px] sm:text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold-500/15 text-gold-300 border border-gold-500/30 font-medium whitespace-nowrap shrink-0">
+                            Listo
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-stone-400 hidden lg:block">Carpeta Navideña de Google Drive & Smart Auto-EQ</p>
                 </div>
             </div>
-            <div class="min-w-0">
-                <div class="flex items-center gap-2">
-                    <h1 class="font-serif text-base sm:text-xl font-bold tracking-wide bg-gradient-to-r from-stone-100 via-gold-300 to-gold-500 bg-clip-text text-transparent truncate">
-                        NoelStream
-                    </h1>
-                    <span id="connection-badge" class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold-500/15 text-gold-300 border border-gold-500/30 font-medium whitespace-nowrap">
-                        Listo para Conectar
-                    </span>
-                </div>
-                <p class="text-[11px] text-stone-400 hidden md:block">Carpeta Navideña de Google Drive & Smart Auto-EQ</p>
-            </div>
-        </div>
 
-        <!-- Barra de búsqueda central -->
-        <div class="flex-1 max-w-md mx-2 sm:mx-4">
-            <div class="relative">
-                <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
-                <input id="search-input" type="text" placeholder="Buscar canción, álbum o carpeta..." 
-                    class="w-full bg-pine-950/80 border border-gold-500/20 focus:border-gold-400 rounded-full pl-9 pr-8 py-1.5 text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none transition">
-                <button id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200">
-                    <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            <!-- Botones de Acción Rápida en Móvil/PC (nunca colisionan con el buscador) -->
+            <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 md:hidden">
+                <button onclick="document.getElementById('local-file-input').click()" 
+                    title="Cargar MP3/WAV desde tu celular"
+                    class="p-2 rounded-full bg-pine-800/90 hover:bg-pine-700 text-gold-400 border border-gold-500/25 transition shrink-0">
+                    <i data-lucide="folder-plus" class="w-4 h-4"></i>
+                </button>
+
+                <button id="main-drive-btn-mob" onclick="handleOneTouchDriveClick()" 
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white shadow-lg shadow-crimson-600/25 text-[11px] font-semibold transition whitespace-nowrap shrink-0">
+                    <i data-lucide="cloud" class="w-3.5 h-3.5 shrink-0"></i>
+                    <span class="drive-btn-label-text">Conectar Drive</span>
+                </button>
+
+                <button onclick="openDriveModal()" title="Ajustes de Google Drive"
+                    class="p-2 rounded-full bg-pine-900/90 hover:bg-pine-800 text-gold-300 border border-gold-500/25 transition shrink-0">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Botones de Acción Rápida: Subir Local, Conectar Drive (1-Toque) y Ajustes -->
-        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <!-- Fila 2 en Móvil / Centro en PC: Barra de búsqueda 100% despejada -->
+        <div class="w-full md:flex-1 md:max-w-md md:mx-4">
+            <div class="relative w-full">
+                <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                <input id="search-input" type="text" placeholder="Buscar canción, álbum o artista..." 
+                    class="w-full bg-pine-950/90 border border-gold-500/25 focus:border-gold-400 rounded-full pl-9 pr-9 py-1.5 sm:py-2 text-xs sm:text-sm text-stone-100 placeholder-stone-400 focus:outline-none transition">
+                <button id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 p-0.5">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Botones de Acción Rápida en Escritorio (md y superior) -->
+        <div class="hidden md:flex items-center gap-2 shrink-0">
             <button onclick="document.getElementById('local-file-input').click()" 
                 title="Cargar MP3/WAV desde tu celular o PC"
-                class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-pine-800/80 hover:bg-pine-700 text-stone-200 border border-gold-500/20 text-xs font-medium transition">
+                class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pine-800/80 hover:bg-pine-700 text-stone-200 border border-gold-500/20 text-xs font-medium transition shrink-0">
                 <i data-lucide="folder-plus" class="w-4 h-4 text-gold-400"></i>
                 <span class="hidden lg:inline">Audio Local</span>
             </button>
 
-            <!-- Botón de Conexión / Sincronización Directa a un solo toque -->
             <button id="main-drive-btn" onclick="handleOneTouchDriveClick()" 
-                class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white shadow-lg shadow-crimson-600/25 text-xs font-semibold transition">
-                <i id="main-drive-icon" data-lucide="cloud" class="w-4 h-4"></i>
-                <span id="drive-btn-label">Conectar mi Drive</span>
+                class="flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white shadow-lg shadow-crimson-600/25 text-xs font-semibold transition whitespace-nowrap shrink-0">
+                <i id="main-drive-icon" data-lucide="cloud" class="w-4 h-4 shrink-0"></i>
+                <span id="drive-btn-label" class="drive-btn-label-text">Conectar mi Drive</span>
             </button>
 
-            <!-- Botón de Ajustes de Credenciales / Carpeta -->
             <button onclick="openDriveModal()" title="Ajustes de Cuenta y Carpeta de Google Drive"
-                class="p-2 rounded-full bg-pine-900/90 hover:bg-pine-800 text-gold-300 border border-gold-500/25 transition">
+                class="p-2 rounded-full bg-pine-900/90 hover:bg-pine-800 text-gold-300 border border-gold-500/25 transition shrink-0">
                 <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
         </div>
@@ -280,49 +311,49 @@
         <main class="flex-1 flex flex-col overflow-hidden bg-pine-950/30">
             
             <!-- Pestañas de navegación para Móvil / Tablet -->
-            <div class="flex lg:hidden items-center gap-1.5 px-3 pt-2.5 pb-2 overflow-x-auto border-b border-gold-500/10 shrink-0">
-                <button onclick="switchView('all')" id="mob-nav-all" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-gold-500/20 text-gold-300 border border-gold-500/40">
+            <div class="flex lg:hidden items-center gap-1.5 px-3 pt-2 pb-2 overflow-x-auto no-scrollbar border-b border-gold-500/10 shrink-0">
+                <button onclick="switchView('all')" id="mob-nav-all" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-gold-500/20 text-gold-300 border border-gold-500/40 shrink-0">
                     Canciones
                 </button>
-                <button onclick="switchView('folders')" id="mob-nav-folders" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60">
+                <button onclick="switchView('folders')" id="mob-nav-folders" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60 shrink-0">
                     Álbumes Drive
                 </button>
-                <button onclick="switchView('favorites')" id="mob-nav-favorites" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60">
+                <button onclick="switchView('favorites')" id="mob-nav-favorites" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60 shrink-0">
                     Favoritos
                 </button>
-                <button onclick="switchView('playlists')" id="mob-nav-playlists" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60">
+                <button onclick="switchView('playlists')" id="mob-nav-playlists" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60 shrink-0">
                     Playlists
                 </button>
-                <button onclick="switchView('eq')" id="mob-nav-eq" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60 flex items-center gap-1">
+                <button onclick="switchView('eq')" id="mob-nav-eq" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60 flex items-center gap-1 shrink-0">
                     <i data-lucide="sliders" class="w-3.5 h-3.5 text-gold-400"></i>
                     Smart EQ
                 </button>
             </div>
 
             <!-- Cabecera contextual de la vista -->
-            <div class="px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-gold-500/10 shrink-0">
-                <div>
+            <div class="px-4 sm:px-6 py-2.5 sm:py-3.5 flex flex-wrap items-center justify-between gap-2 border-b border-gold-500/10 shrink-0">
+                <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-2 flex-wrap">
-                        <h2 id="view-title" class="font-serif text-lg sm:text-2xl font-bold text-stone-100">Todas las Canciones</h2>
+                        <h2 id="view-title" class="font-serif text-base sm:text-2xl font-bold text-stone-100 truncate">Todas las Canciones</h2>
                         <span id="active-folder-pill" class="hidden text-xs px-2.5 py-0.5 rounded-full bg-crimson-600/20 border border-crimson-500/40 text-rose-300"></span>
                     </div>
-                    <p id="view-subtitle" class="text-xs text-stone-400 mt-0.5">Biblioteca lista para streaming directo sin descargar archivos al dispositivo</p>
+                    <p id="view-subtitle" class="text-[11px] sm:text-xs text-stone-400 mt-0.5 truncate">Biblioteca lista para streaming directo sin descargar archivos</p>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <button onclick="playAllCurrentView()" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gold-500 hover:bg-gold-400 text-pine-950 font-semibold text-xs transition shadow-md shadow-gold-500/10">
+                <div class="flex items-center gap-2 shrink-0">
+                    <button onclick="playAllCurrentView()" class="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-gold-500 hover:bg-gold-400 text-pine-950 font-semibold text-xs transition shadow-md shadow-gold-500/10">
                         <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
                         <span>Reproducir Todo</span>
                     </button>
-                    <button onclick="openNewPlaylistModal()" class="flex lg:hidden items-center gap-1 px-3 py-2 rounded-xl bg-pine-800 hover:bg-pine-700 text-gold-300 border border-gold-500/20 text-xs font-medium">
+                    <button onclick="openNewPlaylistModal()" class="flex lg:hidden items-center gap-1 px-2.5 py-1.5 rounded-xl bg-pine-800 hover:bg-pine-700 text-gold-300 border border-gold-500/20 text-xs font-medium">
                         <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                         <span>Lista</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Contenedor con scroll para canciones / carpetas / playlists -->
-            <div id="main-scroll-area" class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3"></div>
+            <!-- Contenedor con scroll para canciones / carpetas / playlists (con holgura inferior para el player) -->
+            <div id="main-scroll-area" class="flex-1 overflow-y-auto p-3 sm:p-6 pb-8 space-y-2.5"></div>
         </main>
 
         <!-- PANEL LATERAL DERECHO: SMART AUTO-EQ & ESPECTRO EN VIVO -->
@@ -449,77 +480,108 @@
         </aside>
     </div>
 
-    <!-- BARRA INFERIOR DE REPRODUCCIÓN (Player Completo) -->
-    <footer class="relative z-30 glass-panel border-t border-gold-500/25 px-3 sm:px-6 py-2.5 sm:py-3 shrink-0">
-        <!-- Barra de progreso superior interactiva -->
-        <div class="flex items-center gap-3 mb-2">
-            <span id="current-time" class="text-[11px] font-mono text-stone-400 w-9 text-right">0:00</span>
+    <!-- BARRA INFERIOR DE REPRODUCCIÓN (Adaptada al 100% para Celular y PC con todos los 7 botones visibles) -->
+    <footer class="relative z-30 glass-panel border-t border-gold-500/30 px-3 sm:px-6 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+10px)] sm:py-3 shrink-0 shadow-2xl">
+        
+        <!-- Fila 1 (Solo en Móvil): Mini Info de la Canción Actual + Botón Favorito y Smart EQ -->
+        <div class="flex sm:hidden items-center justify-between gap-2 mb-1.5 px-1">
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+                <div id="player-cover-mob" class="w-8 h-8 rounded-lg bg-gradient-to-br from-crimson-700 via-pine-800 to-gold-600 flex items-center justify-center text-sm shrink-0 border border-gold-500/30">
+                    🎄
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p id="player-title-mob" class="text-xs font-semibold text-stone-100 truncate">Selecciona una canción</p>
+                    <p id="player-artist-mob" class="text-[10px] text-stone-400 truncate">Biblioteca Navideña Drive</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+                <span id="player-eq-pill-mob" onclick="switchView('eq')" class="text-[9px] text-gold-300 bg-gold-500/15 border border-gold-500/30 px-2 py-0.5 rounded-full font-medium cursor-pointer">
+                    Smart EQ
+                </span>
+                <button onclick="toggleFavoriteCurrent()" class="text-stone-300 hover:text-crimson-500 p-1" title="Favorito">
+                    <i data-lucide="heart" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Fila de Barra de Avance (Seek Bar) -->
+        <div class="flex items-center gap-2.5 sm:gap-3 mb-2">
+            <span id="current-time" class="text-[10px] sm:text-[11px] font-mono text-stone-400 w-8 sm:w-9 text-right shrink-0">0:00</span>
             <div class="relative flex-1 flex items-center group">
                 <input id="seek-bar" type="range" min="0" max="100" value="0" step="0.1"
                     class="eq-slider w-full z-10" oninput="onSeekInput(this.value)" onchange="onSeekCommit(this.value)">
                 <div id="seek-fill" class="absolute left-0 h-1.5 bg-gradient-to-r from-crimson-500 to-gold-400 rounded-full pointer-events-none" style="width: 0%"></div>
             </div>
-            <span id="total-duration" class="text-[11px] font-mono text-stone-400 w-9">0:00</span>
+            <span id="total-duration" class="text-[10px] sm:text-[11px] font-mono text-stone-400 w-8 sm:w-9 shrink-0">0:00</span>
         </div>
 
+        <!-- Fila Principal de Controles (Los 7 botones siempre visibles en Celular y PC) -->
         <div class="flex items-center justify-between gap-2">
-            <!-- Info de la Canción Actual -->
-            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 w-2/5 sm:w-1/4">
-                <div id="player-cover" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-crimson-700 via-pine-800 to-gold-600 flex items-center justify-center text-lg sm:text-xl shrink-0 shadow-md border border-gold-500/30">
+            
+            <!-- Info de la Canción Actual (Visible en Tablet/PC >= 640px) -->
+            <div class="hidden sm:flex items-center gap-3 min-w-0 w-1/4">
+                <div id="player-cover" class="w-11 h-11 rounded-xl bg-gradient-to-br from-crimson-700 via-pine-800 to-gold-600 flex items-center justify-center text-xl shrink-0 shadow-md border border-gold-500/30">
                     🎄
                 </div>
                 <div class="min-w-0 flex-1">
-                    <p id="player-title" class="text-xs sm:text-sm font-semibold text-stone-100 truncate">Selecciona una canción</p>
+                    <p id="player-title" class="text-sm font-semibold text-stone-100 truncate">Selecciona una canción</p>
                     <p id="player-artist" class="text-[11px] text-stone-400 truncate">Biblioteca Navideña Drive</p>
                     <span id="player-eq-pill" class="inline-block text-[9px] text-gold-300 bg-gold-500/10 border border-gold-500/25 px-1.5 py-0.2 rounded mt-0.5 truncate max-w-full">
                         Smart EQ: Listo
                     </span>
                 </div>
-                <button id="fav-current-btn" onclick="toggleFavoriteCurrent()" class="text-stone-400 hover:text-crimson-500 transition p-1 hidden sm:block" title="Marcar como favorito">
+                <button id="fav-current-btn" onclick="toggleFavoriteCurrent()" class="text-stone-400 hover:text-crimson-500 transition p-1" title="Marcar como favorito">
                     <i data-lucide="heart" class="w-4 h-4"></i>
                 </button>
             </div>
 
-            <!-- Controles Principales de Transporte -->
-            <div class="flex items-center justify-center gap-1 sm:gap-2.5 flex-1">
+            <!-- LOS 7 BOTONES DE TRANSPORTE (Visibles siempre en Móvil y PC) -->
+            <div class="flex items-center justify-between sm:justify-center gap-1 sm:gap-2.5 w-full sm:w-auto sm:flex-1 px-1 sm:px-0">
+                <!-- 1. Aleatorio (Shuffle) -->
                 <button id="btn-shuffle" onclick="toggleShuffle()" title="Reproducción Aleatoria"
-                    class="p-1.5 sm:p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition hidden sm:inline-flex">
+                    class="p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition inline-flex items-center justify-center shrink-0">
                     <i data-lucide="shuffle" class="w-4 h-4"></i>
                 </button>
 
+                <!-- 2. Retroceder Canción -->
                 <button onclick="prevTrack()" title="Canción Anterior"
-                    class="p-1.5 sm:p-2 rounded-full text-stone-200 hover:text-gold-300 hover:bg-white/5 transition">
+                    class="p-2 rounded-full text-stone-200 hover:text-gold-300 hover:bg-white/5 transition inline-flex items-center justify-center shrink-0">
                     <i data-lucide="skip-back" class="w-5 h-5"></i>
                 </button>
 
+                <!-- 3. Retroceder 10 segundos -->
                 <button onclick="skipSeconds(-10)" title="Retroceder 10 segundos"
-                    class="flex items-center justify-center px-2 py-1 rounded-lg bg-pine-800/80 hover:bg-pine-700 text-gold-300 border border-gold-500/20 text-[10px] sm:text-[11px] font-mono font-semibold transition">
+                    class="flex items-center justify-center px-2.5 py-1.5 rounded-lg bg-pine-800/90 hover:bg-pine-700 text-gold-300 border border-gold-500/25 text-[11px] font-mono font-semibold transition shrink-0">
                     -10s
                 </button>
 
+                <!-- 4. Reproducir / Pausar -->
                 <button id="btn-play-pause" onclick="togglePlayPause()" title="Reproducir / Pausar"
-                    class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 hover:from-gold-300 hover:to-gold-500 text-pine-950 flex items-center justify-center shadow-lg shadow-gold-500/25 transition transform active:scale-95 mx-0.5 sm:mx-1 shrink-0">
+                    class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 hover:from-gold-300 hover:to-gold-500 text-pine-950 flex items-center justify-center shadow-lg shadow-gold-500/30 transition transform active:scale-95 mx-0.5 shrink-0">
                     <i id="play-icon" data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
                 </button>
 
+                <!-- 5. Adelantar 10 segundos -->
                 <button onclick="skipSeconds(10)" title="Adelantar 10 segundos"
-                    class="flex items-center justify-center px-2 py-1 rounded-lg bg-pine-800/80 hover:bg-pine-700 text-gold-300 border border-gold-500/20 text-[10px] sm:text-[11px] font-mono font-semibold transition">
+                    class="flex items-center justify-center px-2.5 py-1.5 rounded-lg bg-pine-800/90 hover:bg-pine-700 text-gold-300 border border-gold-500/25 text-[11px] font-mono font-semibold transition shrink-0">
                     +10s
                 </button>
 
+                <!-- 6. Avanzar Canción -->
                 <button onclick="nextTrack()" title="Siguiente Canción"
-                    class="p-1.5 sm:p-2 rounded-full text-stone-200 hover:text-gold-300 hover:bg-white/5 transition">
+                    class="p-2 rounded-full text-stone-200 hover:text-gold-300 hover:bg-white/5 transition inline-flex items-center justify-center shrink-0">
                     <i data-lucide="skip-forward" class="w-5 h-5"></i>
                 </button>
 
+                <!-- 7. Repetir -->
                 <button id="btn-repeat" onclick="toggleRepeat()" title="Repetir Lista / Canción"
-                    class="p-1.5 sm:p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative hidden sm:inline-flex">
+                    class="p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative inline-flex items-center justify-center shrink-0">
                     <i data-lucide="repeat" class="w-4 h-4"></i>
-                    <span id="repeat-one-badge" class="hidden absolute top-1 right-1 text-[8px] bg-gold-500 text-pine-950 font-bold rounded-full w-3 h-3 flex items-center justify-center">1</span>
+                    <span id="repeat-one-badge" class="hidden absolute top-0.5 right-0.5 text-[8px] bg-gold-500 text-pine-950 font-bold rounded-full w-3.5 h-3.5 flex items-center justify-center">1</span>
                 </button>
             </div>
 
-            <!-- Control de Volumen y Acceso Rápido al EQ -->
+            <!-- Control de Volumen y Acceso Rápido al EQ (Tablet/PC) -->
             <div class="hidden sm:flex items-center justify-end gap-2.5 w-1/4">
                 <button onclick="toggleMute()" id="btn-mute" class="text-stone-300 hover:text-gold-300 p-1">
                     <i id="volume-icon" data-lucide="volume-2" class="w-4 h-4"></i>
@@ -845,6 +907,18 @@
             });
         }
 
+        // Filtro anti-archivos basura de Windows/Mac (desktop.ini, Thumbs.db, .DS_Store)
+        function isSystemJunkFile(titleOrFilename) {
+            if (!titleOrFilename) return true;
+            const lower = titleOrFilename.trim().toLowerCase();
+            const baseNoExt = lower.replace(/\.[^/.]+$/, '');
+            const junkNames = ['desktop', 'desktop.ini', 'thumbs', 'thumbs.db', '.ds_store', 'ds_store', 'folder.jpg', 'albumartsmall', 'folder'];
+            if (junkNames.includes(lower) || junkNames.includes(baseNoExt)) return true;
+            if (lower.startsWith('.') || lower.startsWith('~$')) return true;
+            if (lower.endsWith('.ini') || lower.endsWith('.db') || lower.endsWith('.jpg') || lower.endsWith('.png') || lower.endsWith('.txt')) return true;
+            return false;
+        }
+
         function loadInitialState() {
             // Asegurar que las credenciales por defecto estén en los inputs
             document.getElementById('gdrive-client-id').value = state.googleClientId;
@@ -864,12 +938,14 @@
                     ];
                 }
 
-                // Cargar biblioteca de Google Drive guardada en caché local si existe
+                // Cargar biblioteca de Google Drive guardada en caché local y limpiar desktop.ini / Thumbs.db
                 const cachedDriveTracks = JSON.parse(localStorage.getItem('noel_cached_drive_tracks') || 'null');
                 if (cachedDriveTracks && Array.isArray(cachedDriveTracks) && cachedDriveTracks.length > 0) {
-                    state.tracks = cachedDriveTracks;
-                    document.getElementById('connection-badge').textContent = `Biblioteca Guardada (${cachedDriveTracks.length})`;
-                    document.getElementById('connection-badge').className = 'text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/40 font-medium whitespace-nowrap';
+                    const cleanTracks = cachedDriveTracks.filter(t => !isSystemJunkFile(t.title));
+                    state.tracks = cleanTracks;
+                    localStorage.setItem('noel_cached_drive_tracks', JSON.stringify(cleanTracks));
+                    document.getElementById('connection-badge').textContent = `${cleanTracks.length} Pistas en Drive`;
+                    document.getElementById('connection-badge').className = 'text-[9px] sm:text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/40 font-medium whitespace-nowrap shrink-0';
                 } else {
                     state.tracks = getDemoTracksList();
                 }
@@ -1128,9 +1204,10 @@
             const profile = EQ_PROFILES[track.genre] || EQ_PROFILES.coral;
             document.getElementById('detected-genre-label').textContent = profile.name;
             document.getElementById('eq-explanation').textContent = profile.desc;
-            document.getElementById('player-eq-pill').textContent = state.smartEqEnabled
-                ? `Smart EQ: ${profile.name}`
-                : `EQ Manual`;
+            const pillText = state.smartEqEnabled ? `Smart EQ: ${profile.name}` : `EQ Manual`;
+            document.getElementById('player-eq-pill').textContent = pillText;
+            const mobPill = document.getElementById('player-eq-pill-mob');
+            if (mobPill) mobPill.textContent = pillText;
 
             if (state.smartEqEnabled) {
                 updateFilterGainsUIAndAudio(profile.gains, true);
@@ -1335,8 +1412,8 @@
             state.isShuffle = !state.isShuffle;
             const btn = document.getElementById('btn-shuffle');
             btn.className = state.isShuffle
-                ? 'p-1.5 sm:p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition hidden sm:inline-flex'
-                : 'p-1.5 sm:p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition hidden sm:inline-flex';
+                ? 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition inline-flex items-center justify-center shrink-0'
+                : 'p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition inline-flex items-center justify-center shrink-0';
             showToast(state.isShuffle ? 'Modo Aleatorio activado' : 'Modo Aleatorio desactivado', 'info');
         }
 
@@ -1349,13 +1426,13 @@
             const badge = document.getElementById('repeat-one-badge');
 
             if (next === 'none') {
-                btn.className = 'p-1.5 sm:p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative hidden sm:inline-flex';
+                btn.className = 'p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative inline-flex items-center justify-center shrink-0';
                 badge.classList.add('hidden');
             } else if (next === 'all') {
-                btn.className = 'p-1.5 sm:p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative hidden sm:inline-flex';
+                btn.className = 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative inline-flex items-center justify-center shrink-0';
                 badge.classList.add('hidden');
             } else {
-                btn.className = 'p-1.5 sm:p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative hidden sm:inline-flex';
+                btn.className = 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative inline-flex items-center justify-center shrink-0';
                 badge.classList.remove('hidden');
             }
         }
@@ -1447,6 +1524,14 @@
                 document.getElementById('player-title').textContent = track.title;
                 document.getElementById('player-artist').textContent = `${track.artist} • ${track.album}`;
                 document.getElementById('player-cover').textContent = track.coverEmoji || '🎄';
+
+                // Actualizar también la fila compacta del reproductor móvil
+                const mobTitle = document.getElementById('player-title-mob');
+                const mobArtist = document.getElementById('player-artist-mob');
+                const mobCover = document.getElementById('player-cover-mob');
+                if (mobTitle) mobTitle.textContent = track.title;
+                if (mobArtist) mobArtist.textContent = track.album;
+                if (mobCover) mobCover.textContent = track.coverEmoji || '🎄';
             }
 
             const btnPlay = document.getElementById('btn-play-pause');
@@ -1962,9 +2047,11 @@
                             state.googleAccessToken = tokenResponse.access_token;
                             closeDriveModal();
 
-                            document.getElementById('drive-btn-label').textContent = 'Sincronizar Drive';
+                            document.querySelectorAll('.drive-btn-label-text').forEach(el => {
+                                el.textContent = 'Sincronizar Drive';
+                            });
                             document.getElementById('connection-badge').textContent = 'Drive Conectado';
-                            document.getElementById('connection-badge').className = 'text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-medium whitespace-nowrap';
+                            document.getElementById('connection-badge').className = 'text-[9px] sm:text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-medium whitespace-nowrap shrink-0';
 
                             // Si el usuario había tocado Play en una canción guardada en caché, reproducirla de inmediato
                             if (state.pendingTrackPlayAfterAuth !== null) {
@@ -2058,8 +2145,10 @@
                     return;
                 }
 
-                // Ordenar alfabéticamente por álbum y nombre de pista
-                const mappedTracks = discoveredAudioFiles.map(file => {
+                // Filtrar archivos de sistema de Windows/Mac (desktop.ini, Thumbs.db) y ordenar por álbum y pista
+                const validAudioFiles = discoveredAudioFiles.filter(file => !isSystemJunkFile(file.name));
+
+                const mappedTracks = validAudioFiles.map(file => {
                     const cleanTitle = file.name.replace(/\.[^/.]+$/, '');
                     const parentId = (file.parents && file.parents[0]) ? file.parents[0] : rootFolderId;
                     const albumName = folderNameMap[parentId] || 'Álbum Navideño Drive';
