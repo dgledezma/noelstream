@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Identity Services (para conexión real opcional con Drive) -->
+    <!-- Google Identity Services (OAuth 2.0 oficial) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <!-- Google Fonts: Inter & Playfair Display -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -47,7 +47,7 @@
     </script>
 
     <style>
-        /* Estilos personalizados para barras de desplazamiento y deslizadores */
+        /* Barras de desplazamiento elegantes */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -91,7 +91,7 @@
             background: #f7df94;
         }
 
-        /* Fondo festivo elegante con sutil brillo */
+        /* Fondo festivo elegante */
         .festive-bg {
             background: radial-gradient(circle at 15% 15%, rgba(28, 71, 53, 0.45) 0%, transparent 45%),
                         radial-gradient(circle at 85% 20%, rgba(159, 18, 57, 0.25) 0%, transparent 45%),
@@ -100,7 +100,7 @@
         }
 
         .glass-panel {
-            background: rgba(12, 31, 23, 0.72);
+            background: rgba(12, 31, 23, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(212, 175, 55, 0.16);
@@ -127,62 +127,75 @@
 </head>
 <body class="festive-bg text-stone-100 font-sans h-screen overflow-hidden flex flex-col select-none">
 
-    <!-- Copos de nieve decorativos sutiles -->
+    <!-- Copos de nieve decorativos -->
     <div id="snow-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
 
     <!-- Elementos de Audio Reales ocultos (con CORS para Web Audio API) -->
     <audio id="main-audio" crossorigin="anonymous" preload="auto"></audio>
     <input type="file" id="local-file-input" accept="audio/*" multiple class="hidden">
 
-    <!-- Notificación Toast flotante -->
+    <!-- Notificaciones Toast flotantes -->
     <div id="toast-container" class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
 
+    <!-- Indicador de Carga / Buffering de Streaming desde Drive -->
+    <div id="stream-loading-banner" class="hidden fixed top-16 left-1/2 -translate-x-1/2 z-50 glass-panel border border-gold-400/50 px-4 py-2 rounded-full shadow-2xl items-center gap-2.5 text-xs text-gold-300 font-medium">
+        <div class="w-3.5 h-3.5 border-2 border-gold-400 border-t-transparent rounded-full animate-spin"></div>
+        <span id="stream-loading-text">Cargando stream desde Google Drive...</span>
+    </div>
+
     <!-- CABECERA PRINCIPAL (Móvil + PC) -->
-    <header class="relative z-20 glass-panel border-b border-gold-500/20 px-4 py-3 flex items-center justify-between shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-crimson-600 to-pine-800 p-0.5 gold-glow flex items-center justify-center">
+    <header class="relative z-20 glass-panel border-b border-gold-500/20 px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-crimson-600 to-pine-800 p-0.5 gold-glow flex items-center justify-center shrink-0">
                 <div class="w-full h-full bg-pine-950/90 rounded-[10px] flex items-center justify-center text-gold-400">
                     <i data-lucide="sparkles" class="w-5 h-5"></i>
                 </div>
             </div>
-            <div>
+            <div class="min-w-0">
                 <div class="flex items-center gap-2">
-                    <h1 class="font-serif text-lg sm:text-xl font-bold tracking-wide bg-gradient-to-r from-stone-100 via-gold-300 to-gold-500 bg-clip-text text-transparent">
+                    <h1 class="font-serif text-base sm:text-xl font-bold tracking-wide bg-gradient-to-r from-stone-100 via-gold-300 to-gold-500 bg-clip-text text-transparent truncate">
                         NoelStream
                     </h1>
-                    <span id="connection-badge" class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold-500/15 text-gold-300 border border-gold-500/30 font-medium">
-                        Biblioteca Demo Activa
+                    <span id="connection-badge" class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold-500/15 text-gold-300 border border-gold-500/30 font-medium whitespace-nowrap">
+                        Listo para Conectar
                     </span>
                 </div>
-                <p class="text-xs text-stone-400 hidden sm:block">Google Drive Cloud Player & Smart Auto-EQ</p>
+                <p class="text-[11px] text-stone-400 hidden md:block">Carpeta Navideña de Google Drive & Smart Auto-EQ</p>
             </div>
         </div>
 
         <!-- Barra de búsqueda central -->
-        <div class="flex-1 max-w-md mx-3 sm:mx-6">
+        <div class="flex-1 max-w-md mx-2 sm:mx-4">
             <div class="relative">
-                <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
-                <input id="search-input" type="text" placeholder="Buscar villancico, álbum o artista..." 
-                    class="w-full bg-pine-950/80 border border-gold-500/20 focus:border-gold-400 rounded-full pl-10 pr-8 py-1.5 text-sm text-stone-100 placeholder-stone-500 focus:outline-none transition">
+                <i data-lucide="search" class="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                <input id="search-input" type="text" placeholder="Buscar canción, álbum o carpeta..." 
+                    class="w-full bg-pine-950/80 border border-gold-500/20 focus:border-gold-400 rounded-full pl-9 pr-8 py-1.5 text-xs sm:text-sm text-stone-100 placeholder-stone-500 focus:outline-none transition">
                 <button id="clear-search-btn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200">
                     <i data-lucide="x" class="w-3.5 h-3.5"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Botones de Acción Rápida -->
-        <div class="flex items-center gap-2">
+        <!-- Botones de Acción Rápida: Subir Local, Conectar Drive (1-Toque) y Ajustes -->
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button onclick="document.getElementById('local-file-input').click()" 
                 title="Cargar MP3/WAV desde tu celular o PC"
-                class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pine-800/80 hover:bg-pine-700 text-stone-200 border border-gold-500/20 text-xs font-medium transition">
+                class="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-pine-800/80 hover:bg-pine-700 text-stone-200 border border-gold-500/20 text-xs font-medium transition">
                 <i data-lucide="folder-plus" class="w-4 h-4 text-gold-400"></i>
-                <span class="hidden md:inline">Subir Audio Local</span>
+                <span class="hidden lg:inline">Audio Local</span>
             </button>
 
-            <button onclick="openDriveModal()" 
-                class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white shadow-lg shadow-crimson-600/25 text-xs font-semibold transition">
-                <i data-lucide="hard-drive" class="w-4 h-4"></i>
-                <span id="drive-btn-label" class="hidden sm:inline">Conectar Google Drive</span>
+            <!-- Botón de Conexión / Sincronización Directa a un solo toque -->
+            <button id="main-drive-btn" onclick="handleOneTouchDriveClick()" 
+                class="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white shadow-lg shadow-crimson-600/25 text-xs font-semibold transition">
+                <i id="main-drive-icon" data-lucide="cloud" class="w-4 h-4"></i>
+                <span id="drive-btn-label">Conectar mi Drive</span>
+            </button>
+
+            <!-- Botón de Ajustes de Credenciales / Carpeta -->
+            <button onclick="openDriveModal()" title="Ajustes de Cuenta y Carpeta de Google Drive"
+                class="p-2 rounded-full bg-pine-900/90 hover:bg-pine-800 text-gold-300 border border-gold-500/25 transition">
+                <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
         </div>
     </header>
@@ -195,7 +208,13 @@
             <div class="space-y-6">
                 <!-- Menú Biblioteca -->
                 <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-wider text-gold-400/80 px-3 mb-2">Tu Música en Drive</p>
+                    <div class="flex items-center justify-between px-3 mb-2">
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-gold-400/80">Biblioteca Drive</p>
+                        <button onclick="handleOneTouchDriveClick()" title="Re-escanear subcarpetas de Google Drive" class="text-[11px] text-gold-400 hover:text-gold-300 flex items-center gap-1">
+                            <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                            <span>Sincronizar</span>
+                        </button>
+                    </div>
                     <nav class="space-y-1">
                         <button onclick="switchView('all')" id="nav-all" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition bg-gold-500/15 text-gold-300 border border-gold-500/30">
                             <span class="flex items-center gap-2.5">
@@ -207,7 +226,7 @@
                         <button onclick="switchView('folders')" id="nav-folders" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-stone-300 hover:bg-pine-800/50 transition">
                             <span class="flex items-center gap-2.5">
                                 <i data-lucide="folder-heart" class="w-4 h-4 text-gold-400"></i>
-                                Subcarpetas / Álbumes
+                                Álbumes / Carpetas
                             </span>
                             <span id="count-folders" class="text-xs bg-pine-950/80 px-2 py-0.5 rounded-full text-stone-400">0</span>
                         </button>
@@ -229,21 +248,31 @@
                             <i data-lucide="plus-circle" class="w-4 h-4"></i>
                         </button>
                     </div>
-                    <div id="sidebar-playlists" class="space-y-1 max-h-48 overflow-y-auto pr-1">
-                        <!-- Renderizado dinámico -->
-                    </div>
+                    <div id="sidebar-playlists" class="space-y-1 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
             </div>
 
-            <!-- Tarjeta informativa de Pantalla Bloqueada & PWA -->
-            <div class="p-3.5 rounded-2xl bg-gradient-to-br from-pine-900 to-pine-950 border border-gold-500/20 space-y-2">
-                <div class="flex items-center gap-2 text-gold-300 text-xs font-semibold">
-                    <i data-lucide="smartphone" class="w-4 h-4 shrink-0"></i>
-                    <span>Pantalla Bloqueada Activa</span>
+            <!-- Estado de Carpeta Preconfigurada & Pantalla Bloqueada -->
+            <div class="space-y-2.5">
+                <div class="p-3 rounded-2xl bg-pine-950/90 border border-gold-500/20 space-y-1.5">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="text-gold-300 font-semibold flex items-center gap-1.5">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            ID de Carpeta Integrado
+                        </span>
+                    </div>
+                    <p class="text-[10px] text-stone-400 truncate font-mono">1hJmoxsEJb0mTIOSKAiFeppb9A63f1kx2</p>
                 </div>
-                <p class="text-[11px] text-stone-400 leading-relaxed">
-                    Integrado con <span class="text-stone-200 font-medium">MediaSession API</span>. Puedes bloquear tu celular y controlar la música desde la pantalla de bloqueo o tus audífonos.
-                </p>
+
+                <div class="p-3 rounded-2xl bg-gradient-to-br from-pine-900 to-pine-950 border border-gold-500/20 space-y-1">
+                    <div class="flex items-center gap-2 text-gold-300 text-xs font-semibold">
+                        <i data-lucide="smartphone" class="w-4 h-4 shrink-0"></i>
+                        <span>Pantalla Bloqueada</span>
+                    </div>
+                    <p class="text-[11px] text-stone-400 leading-relaxed">
+                        Controles activos en bloqueo de pantalla y audífonos mediante <span class="text-stone-200">MediaSession</span>.
+                    </p>
+                </div>
             </div>
         </aside>
 
@@ -251,30 +280,33 @@
         <main class="flex-1 flex flex-col overflow-hidden bg-pine-950/30">
             
             <!-- Pestañas de navegación para Móvil / Tablet -->
-            <div class="flex lg:hidden items-center gap-1.5 px-4 pt-3 pb-2 overflow-x-auto border-b border-gold-500/10 shrink-0">
+            <div class="flex lg:hidden items-center gap-1.5 px-3 pt-2.5 pb-2 overflow-x-auto border-b border-gold-500/10 shrink-0">
                 <button onclick="switchView('all')" id="mob-nav-all" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-gold-500/20 text-gold-300 border border-gold-500/40">
                     Canciones
                 </button>
                 <button onclick="switchView('folders')" id="mob-nav-folders" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60">
                     Álbumes Drive
                 </button>
+                <button onclick="switchView('favorites')" id="mob-nav-favorites" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60">
+                    Favoritos
+                </button>
                 <button onclick="switchView('playlists')" id="mob-nav-playlists" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60">
                     Playlists
                 </button>
                 <button onclick="switchView('eq')" id="mob-nav-eq" class="mob-nav-btn px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap text-stone-300 bg-pine-900/60 flex items-center gap-1">
                     <i data-lucide="sliders" class="w-3.5 h-3.5 text-gold-400"></i>
-                    Smart Auto-EQ
+                    Smart EQ
                 </button>
             </div>
 
             <!-- Cabecera contextual de la vista -->
-            <div class="px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-gold-500/10 shrink-0">
+            <div class="px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3 border-b border-gold-500/10 shrink-0">
                 <div>
-                    <div class="flex items-center gap-2">
-                        <h2 id="view-title" class="font-serif text-xl sm:text-2xl font-bold text-stone-100">Todas las Canciones</h2>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 id="view-title" class="font-serif text-lg sm:text-2xl font-bold text-stone-100">Todas las Canciones</h2>
                         <span id="active-folder-pill" class="hidden text-xs px-2.5 py-0.5 rounded-full bg-crimson-600/20 border border-crimson-500/40 text-rose-300"></span>
                     </div>
-                    <p id="view-subtitle" class="text-xs text-stone-400 mt-0.5">Biblioteca sincronizada lista para streaming directo sin descargar</p>
+                    <p id="view-subtitle" class="text-xs text-stone-400 mt-0.5">Biblioteca lista para streaming directo sin descargar archivos al dispositivo</p>
                 </div>
 
                 <div class="flex items-center gap-2">
@@ -290,12 +322,10 @@
             </div>
 
             <!-- Contenedor con scroll para canciones / carpetas / playlists -->
-            <div id="main-scroll-area" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-                <!-- Se inyecta dinámicamente según la vista seleccionada -->
-            </div>
+            <div id="main-scroll-area" class="flex-1 overflow-y-auto p-3 sm:p-6 space-y-3"></div>
         </main>
 
-        <!-- PANEL LATERAL DERECHO: SMART AUTO-EQ & ESPECTRO EN VIVO (Visible en PC o en pestaña móvil) -->
+        <!-- PANEL LATERAL DERECHO: SMART AUTO-EQ & ESPECTRO EN VIVO -->
         <aside id="eq-panel-container" class="hidden xl:flex flex-col w-80 glass-panel border-l border-gold-500/15 p-4 shrink-0 justify-between overflow-y-auto">
             <div class="space-y-4">
                 <!-- Encabezado del Ecualizador Inteligente -->
@@ -346,7 +376,7 @@
                     <canvas id="spectrum-canvas" class="w-full h-24 rounded-lg"></canvas>
                 </div>
 
-                <!-- Selector de Presets Manuales (cuando Smart EQ está apagado o como base) -->
+                <!-- Selector de Presets Manuales -->
                 <div>
                     <div class="flex items-center justify-between mb-1.5">
                         <label class="text-[11px] font-semibold uppercase tracking-wider text-stone-400">Curva de Ecualización</label>
@@ -357,7 +387,7 @@
                         <option value="auto">✨ Automático Inteligente (Según Canción + Espectro)</option>
                         <option value="coral">🎄 Coral & Villancicos Clásicos (Voces Claras)</option>
                         <option value="jazz">🎷 Jazz Navideño Cálido (Graves Suaves & Saxo)</option>
-                        <option value="acustico">🎸 Acústico & Campanas (Brillo Cristalina)</option>
+                        <option value="acustico">🎸 Acústico & Campanas (Brillo Cristalino)</option>
                         <option value="pop">🦌 Pop Navideño Moderno (Bass & Brillo)</option>
                         <option value="flat">⚖️ Estudio Plano (Sin alterar)</option>
                     </select>
@@ -365,7 +395,6 @@
 
                 <!-- 5 Deslizadores de Bandas BiquadFilterNode -->
                 <div class="pt-1 space-y-3">
-                    <!-- 60 Hz -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs">
                             <span class="text-stone-300 font-medium">60 Hz <span class="text-stone-500 text-[10px]">(Sub-Graves / Bombo)</span></span>
@@ -375,7 +404,6 @@
                             oninput="onManualSliderInput(0, this.value)" class="eq-slider w-full">
                     </div>
 
-                    <!-- 250 Hz -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs">
                             <span class="text-stone-300 font-medium">250 Hz <span class="text-stone-500 text-[10px]">(Calidez / Cuerpo)</span></span>
@@ -385,7 +413,6 @@
                             oninput="onManualSliderInput(1, this.value)" class="eq-slider w-full">
                     </div>
 
-                    <!-- 1 kHz -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs">
                             <span class="text-stone-300 font-medium">1 kHz <span class="text-stone-500 text-[10px]">(Presencia Vocal / Coro)</span></span>
@@ -395,7 +422,6 @@
                             oninput="onManualSliderInput(2, this.value)" class="eq-slider w-full">
                     </div>
 
-                    <!-- 4 kHz -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs">
                             <span class="text-stone-300 font-medium">4 kHz <span class="text-stone-500 text-[10px]">(Definición / Cuerdas)</span></span>
@@ -405,7 +431,6 @@
                             oninput="onManualSliderInput(3, this.value)" class="eq-slider w-full">
                     </div>
 
-                    <!-- 12 kHz -->
                     <div class="space-y-1">
                         <div class="flex justify-between text-xs">
                             <span class="text-stone-300 font-medium">12 kHz <span class="text-stone-500 text-[10px]">(Aire / Cascabeles)</span></span>
@@ -417,7 +442,6 @@
                 </div>
             </div>
 
-            <!-- Nota al pie del ecualizador -->
             <div class="pt-3 border-t border-gold-500/10 flex items-center justify-between text-[11px] text-stone-400">
                 <span>Compresor Limitador Activo</span>
                 <span class="text-gold-400 font-medium">32-bit Float DSP</span>
@@ -440,16 +464,14 @@
 
         <div class="flex items-center justify-between gap-2">
             <!-- Info de la Canción Actual -->
-            <div class="flex items-center gap-3 min-w-0 w-1/3 sm:w-1/4">
-                <div id="player-cover" class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-crimson-700 via-pine-800 to-gold-600 flex items-center justify-center text-xl shrink-0 shadow-md border border-gold-500/30">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 w-2/5 sm:w-1/4">
+                <div id="player-cover" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-crimson-700 via-pine-800 to-gold-600 flex items-center justify-center text-lg sm:text-xl shrink-0 shadow-md border border-gold-500/30">
                     🎄
                 </div>
                 <div class="min-w-0 flex-1">
-                    <div class="flex items-center gap-1.5">
-                        <p id="player-title" class="text-xs sm:text-sm font-semibold text-stone-100 truncate">Selecciona una canción</p>
-                    </div>
+                    <p id="player-title" class="text-xs sm:text-sm font-semibold text-stone-100 truncate">Selecciona una canción</p>
                     <p id="player-artist" class="text-[11px] text-stone-400 truncate">Biblioteca Navideña Drive</p>
-                    <span id="player-eq-pill" class="inline-block text-[9px] text-gold-300 bg-gold-500/10 border border-gold-500/25 px-1.5 py-0.2 rounded mt-0.5">
+                    <span id="player-eq-pill" class="inline-block text-[9px] text-gold-300 bg-gold-500/10 border border-gold-500/25 px-1.5 py-0.2 rounded mt-0.5 truncate max-w-full">
                         Smart EQ: Listo
                     </span>
                 </div>
@@ -458,53 +480,46 @@
                 </button>
             </div>
 
-            <!-- Controles Principales de Transporte (+10s, -10s, Play/Pausa, Prev, Next, Shuffle, Repeat) -->
+            <!-- Controles Principales de Transporte -->
             <div class="flex items-center justify-center gap-1 sm:gap-2.5 flex-1">
-                <!-- Shuffle -->
                 <button id="btn-shuffle" onclick="toggleShuffle()" title="Reproducción Aleatoria"
-                    class="p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition">
+                    class="p-1.5 sm:p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition hidden sm:inline-flex">
                     <i data-lucide="shuffle" class="w-4 h-4"></i>
                 </button>
 
-                <!-- Canción Anterior -->
                 <button onclick="prevTrack()" title="Canción Anterior"
-                    class="p-2 rounded-full text-stone-200 hover:text-gold-300 hover:bg-white/5 transition">
+                    class="p-1.5 sm:p-2 rounded-full text-stone-200 hover:text-gold-300 hover:bg-white/5 transition">
                     <i data-lucide="skip-back" class="w-5 h-5"></i>
                 </button>
 
-                <!-- Retroceder 10 segundos (-10s) -->
                 <button onclick="skipSeconds(-10)" title="Retroceder 10 segundos"
-                    class="flex items-center justify-center px-2 py-1 rounded-lg bg-pine-800/80 hover:bg-pine-700 text-gold-300 border border-gold-500/20 text-[11px] font-mono font-semibold transition">
+                    class="flex items-center justify-center px-2 py-1 rounded-lg bg-pine-800/80 hover:bg-pine-700 text-gold-300 border border-gold-500/20 text-[10px] sm:text-[11px] font-mono font-semibold transition">
                     -10s
                 </button>
 
-                <!-- Botón Play / Pausa Central -->
                 <button id="btn-play-pause" onclick="togglePlayPause()" title="Reproducir / Pausar"
-                    class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 hover:from-gold-300 hover:to-gold-500 text-pine-950 flex items-center justify-center shadow-lg shadow-gold-500/25 transition transform active:scale-95 mx-1">
+                    class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 hover:from-gold-300 hover:to-gold-500 text-pine-950 flex items-center justify-center shadow-lg shadow-gold-500/25 transition transform active:scale-95 mx-0.5 sm:mx-1 shrink-0">
                     <i id="play-icon" data-lucide="play" class="w-5 h-5 fill-current ml-0.5"></i>
                 </button>
 
-                <!-- Adelantar 10 segundos (+10s) -->
                 <button onclick="skipSeconds(10)" title="Adelantar 10 segundos"
-                    class="flex items-center justify-center px-2 py-1 rounded-lg bg-pine-800/80 hover:bg-pine-700 text-gold-300 border border-gold-500/20 text-[11px] font-mono font-semibold transition">
+                    class="flex items-center justify-center px-2 py-1 rounded-lg bg-pine-800/80 hover:bg-pine-700 text-gold-300 border border-gold-500/20 text-[10px] sm:text-[11px] font-mono font-semibold transition">
                     +10s
                 </button>
 
-                <!-- Canción Siguiente -->
                 <button onclick="nextTrack()" title="Siguiente Canción"
-                    class="p-2 rounded-full text-stone-200 hover:text-gold-300 hover:bg-white/5 transition">
+                    class="p-1.5 sm:p-2 rounded-full text-stone-200 hover:text-gold-300 hover:bg-white/5 transition">
                     <i data-lucide="skip-forward" class="w-5 h-5"></i>
                 </button>
 
-                <!-- Repeat -->
                 <button id="btn-repeat" onclick="toggleRepeat()" title="Repetir Lista / Canción"
-                    class="p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative">
+                    class="p-1.5 sm:p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative hidden sm:inline-flex">
                     <i data-lucide="repeat" class="w-4 h-4"></i>
                     <span id="repeat-one-badge" class="hidden absolute top-1 right-1 text-[8px] bg-gold-500 text-pine-950 font-bold rounded-full w-3 h-3 flex items-center justify-center">1</span>
                 </button>
             </div>
 
-            <!-- Control de Volumen y Acceso Rápido al EQ en pantallas medianas -->
+            <!-- Control de Volumen y Acceso Rápido al EQ -->
             <div class="hidden sm:flex items-center justify-end gap-2.5 w-1/4">
                 <button onclick="toggleMute()" id="btn-mute" class="text-stone-300 hover:text-gold-300 p-1">
                     <i id="volume-icon" data-lucide="volume-2" class="w-4 h-4"></i>
@@ -519,17 +534,17 @@
         </div>
     </footer>
 
-    <!-- MODAL 1: CONFIGURACIÓN DE GOOGLE DRIVE API (Real OAuth2 + Escaneo de Carpetas) -->
+    <!-- MODAL 1: CONFIGURACIÓN DE GOOGLE DRIVE API (Con tus IDs ya preconfigurados) -->
     <div id="drive-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/75 backdrop-blur-sm p-4">
         <div class="glass-panel border border-gold-500/30 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl overflow-y-auto max-h-[90vh]">
             <div class="flex items-center justify-between border-b border-gold-500/15 pb-3">
                 <div class="flex items-center gap-2.5">
-                    <div class="p-2 rounded-xl bg-crimson-600/20 text-crimson-500 border border-crimson-500/30">
-                        <i data-lucide="cloud" class="w-5 h-5"></i>
+                    <div class="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                        <i data-lucide="check-circle" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h3 class="font-serif text-lg font-bold text-stone-100">Conexión con Google Drive</h3>
-                        <p class="text-xs text-stone-400">Vincula tu carpeta de álbumes de Navidad</p>
+                        <h3 class="font-serif text-lg font-bold text-stone-100">Credenciales Integradas</h3>
+                        <p class="text-xs text-stone-400">Tu Client ID y Carpeta de Navidad ya están configurados</p>
                     </div>
                 </div>
                 <button onclick="closeDriveModal()" class="text-stone-400 hover:text-stone-100 p-1">
@@ -537,31 +552,32 @@
                 </button>
             </div>
 
-            <!-- Explicación amigable -->
             <div class="p-3.5 rounded-2xl bg-pine-950/90 border border-gold-500/20 text-xs text-stone-300 space-y-2 leading-relaxed">
                 <p class="font-semibold text-gold-300 flex items-center gap-1.5">
-                    <i data-lucide="info" class="w-4 h-4"></i>
-                    ¿Cómo conectar tu propia cuenta de Gmail?
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    ¡Todo listo para usar en el PC y en el celular!
                 </p>
                 <p class="text-stone-400">
-                    1. Si deseas usar la app ahora mismo sin configurar nada, ya tienes cargada la <strong>Biblioteca Navideña de Prueba</strong> y también puedes usar el botón <strong>"Subir Audio Local"</strong>.
-                </p>
-                <p class="text-stone-400">
-                    2. Para escanear tus subcarpetas reales de Google Drive, pega tu <strong>OAuth 2.0 Client ID</strong> (de Google Cloud Console con alcance <code class="text-gold-300">drive.readonly</code>) y opcionalmente el <strong>ID de tu carpeta de Navidad</strong>.
+                    Tus llaves ya vienen guardadas en el código. Solo toca <strong>"Conectar mi Drive"</strong> para autorizar tu cuenta de Gmail y escanear todas las subcarpetas de álbumes dentro de tu carpeta navideña.
                 </p>
             </div>
 
             <div class="space-y-3">
                 <div>
-                    <label class="block text-xs font-medium text-stone-300 mb-1">Google OAuth Client ID (Opcional para modo real)</label>
-                    <input id="gdrive-client-id" type="text" placeholder="Ej: 123456789-abc.apps.googleusercontent.com"
-                        class="w-full bg-pine-950 border border-gold-500/25 rounded-xl px-3.5 py-2 text-xs text-stone-100 focus:outline-none focus:border-gold-400">
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-medium text-stone-300">Tu Google OAuth Client ID</label>
+                        <button onclick="restoreDefaultCredentials()" class="text-[11px] text-gold-400 hover:underline">Restaurar predeterminado</button>
+                    </div>
+                    <input id="gdrive-client-id" type="text"
+                        value="394824385942-scevpo0f8q2aik28k1n29k05bnpiuk6i.apps.googleusercontent.com"
+                        class="w-full bg-pine-950 border border-gold-500/25 rounded-xl px-3.5 py-2 text-xs text-stone-100 font-mono focus:outline-none focus:border-gold-400">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-stone-300 mb-1">ID de tu Carpeta de Música Navideña en Drive (Opcional)</label>
-                    <input id="gdrive-folder-id" type="text" placeholder="Dejar vacío para buscar todo el audio en Drive"
-                        class="w-full bg-pine-950 border border-gold-500/25 rounded-xl px-3.5 py-2 text-xs text-stone-100 focus:outline-none focus:border-gold-400">
-                    <p class="text-[10px] text-stone-500 mt-1">Es el código al final del enlace de tu carpeta: drive.google.com/drive/folders/<strong>ESTE_CODIGO</strong></p>
+                    <label class="block text-xs font-medium text-stone-300 mb-1">ID de tu Carpeta Principal de Música Navideña</label>
+                    <input id="gdrive-folder-id" type="text"
+                        value="1hJmoxsEJb0mTIOSKAiFeppb9A63f1kx2"
+                        class="w-full bg-pine-950 border border-gold-500/25 rounded-xl px-3.5 py-2 text-xs text-stone-100 font-mono focus:outline-none focus:border-gold-400">
+                    <p class="text-[10px] text-stone-500 mt-1">La app buscará automáticamente todas las subcarpetas (álbumes) y pistas de audio dentro de esta carpeta.</p>
                 </div>
             </div>
 
@@ -569,12 +585,12 @@
                 <button onclick="authenticateRealGoogleDrive()" 
                     class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-pine-950 font-semibold text-xs transition shadow-lg">
                     <i data-lucide="log-in" class="w-4 h-4"></i>
-                    <span>Iniciar Sesión con Google</span>
+                    <span>Iniciar Sesión y Escanear Ahora</span>
                 </button>
-                <button onclick="simulateDriveScan()" 
-                    class="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-pine-800 hover:bg-pine-700 text-gold-300 border border-gold-500/30 font-medium text-xs transition">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-                    <span>Sincronizar Carpetas Demo</span>
+                <button onclick="clearCachedDriveLibrary()" 
+                    class=" flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-pine-900 hover:bg-pine-800 text-stone-300 border border-gold-500/20 font-medium text-xs transition">
+                    <i data-lucide="trash-2" class="w-4 h-4 text-crimson-500"></i>
+                    <span>Limpiar Caché</span>
                 </button>
             </div>
         </div>
@@ -591,7 +607,7 @@
             </div>
             <div>
                 <label class="block text-xs text-stone-300 mb-1">Nombre de la lista</label>
-                <input id="new-playlist-name" type="text" placeholder="Ej: Cena de Nochebuena 2026"
+                <input id="new-playlist-name" type="text" placeholder="Ej: Cena de Nochebuena"
                     class="w-full bg-pine-950 border border-gold-500/30 rounded-xl px-3.5 py-2 text-sm text-stone-100 focus:outline-none focus:border-gold-400">
             </div>
             <div class="flex justify-end gap-2 pt-2">
@@ -617,24 +633,25 @@
 
     <script>
         /***********************************************************************
-         * 1. GENERADOR DE AUDIO NAVIDEÑO EN MEMORIA (ARCHIVOS WAV REALES)
-         * Crea pistas de audio polifónicas reales con armónicos ricos (bajos,
-         * cuerdas medias y campanas agudas) en formato Blob WAV para que el
-         * elemento <audio>, la pantalla bloqueada del celular (MediaSession)
-         * y el Ecualizador de 5 bandas funcionen al 100% sin fallos de red.
+         * 0. CREDENCIALES INTEGRADAS DEL USUARIO (HARDCODED DEFAULTS)
+         ***********************************************************************/
+        const DEFAULT_CLIENT_ID = "394824385942-scevpo0f8q2aik28k1n29k05bnpiuk6i.apps.googleusercontent.com";
+        const DEFAULT_FOLDER_ID = "1hJmoxsEJb0mTIOSKAiFeppb9A63f1kx2";
+
+        /***********************************************************************
+         * 1. GENERADOR DE AUDIO NAVIDEÑO EN MEMORIA (PISTAS DEMO WAV)
          ***********************************************************************/
         const DEMO_SONGS_BLUEPRINT = [
             {
-                id: 'drive-track-1',
-                title: 'Noche de Paz (Armonía Coral & Campanas)',
+                id: 'demo-track-1',
+                title: 'Noche de Paz (Demo Armonía Coral)',
                 artist: 'Coro Catedral del Norte',
-                album: 'Clásicos Navideños',
-                folderId: 'folder-clasicos',
+                album: 'Clásicos de Muestra',
+                folderId: 'folder-demo-1',
                 genre: 'coral',
                 genreLabel: 'Coral / Vocal',
                 coverEmoji: '🕯️',
                 tempo: 88,
-                // Notas: frecuencia melodía, bajo y duración en tiempos
                 notes: [
                     [392.00, 130.81, 1.5], [440.00, 130.81, 0.5], [392.00, 130.81, 1.0], [329.63, 130.81, 2.5],
                     [392.00, 130.81, 1.5], [440.00, 130.81, 0.5], [392.00, 130.81, 1.0], [329.63, 130.81, 2.5],
@@ -643,11 +660,11 @@
                 ]
             },
             {
-                id: 'drive-track-2',
-                title: 'Jingle Bells Swing (Trio de Jazz)',
+                id: 'demo-track-2',
+                title: 'Jingle Bells Swing (Demo Trio Jazz)',
                 artist: 'Noel Jazz Quartet',
-                album: 'Jazz de Navidad',
-                folderId: 'folder-jazz',
+                album: 'Jazz de Muestra',
+                folderId: 'folder-demo-2',
                 genre: 'jazz',
                 genreLabel: 'Jazz Cálido',
                 coverEmoji: '🎷',
@@ -662,11 +679,11 @@
                 ]
             },
             {
-                id: 'drive-track-3',
-                title: 'Adeste Fideles (Guitarra & Celesta)',
+                id: 'demo-track-3',
+                title: 'Adeste Fideles (Demo Guitarra & Celesta)',
                 artist: 'Ensamble Acústico Austral',
-                album: 'Villancicos Acústicos',
-                folderId: 'folder-acusticos',
+                album: 'Acústicos de Muestra',
+                folderId: 'folder-demo-3',
                 genre: 'acustico',
                 genreLabel: 'Acústico Brillante',
                 coverEmoji: '🎸',
@@ -678,11 +695,11 @@
                 ]
             },
             {
-                id: 'drive-track-4',
-                title: 'Joy to the World (Synth Pop Festivo)',
+                id: 'demo-track-4',
+                title: 'Joy to the World (Demo Synth Pop)',
                 artist: 'Aurora Boreal Pop',
-                album: 'Pop Navideño Moderno',
-                folderId: 'folder-pop',
+                album: 'Pop Navideño de Muestra',
+                folderId: 'folder-demo-4',
                 genre: 'pop',
                 genreLabel: 'Pop Dinámico',
                 coverEmoji: '🦌',
@@ -692,46 +709,9 @@
                     [349.23, 174.61, 1], [329.63, 130.81, 2], [293.66, 196.00, 2], [261.63, 130.81, 3],
                     [392.00, 196.00, 1], [440.00, 174.61, 3], [440.00, 174.61, 1], [493.88, 196.00, 3], [493.88, 196.00, 1], [523.25, 130.81, 4]
                 ]
-            },
-            {
-                id: 'drive-track-5',
-                title: 'We Wish You a Merry Christmas (Campanas Reales)',
-                artist: 'Orquesta Sinfónica de Invierno',
-                album: 'Clásicos Navideños',
-                folderId: 'folder-clasicos',
-                genre: 'coral',
-                genreLabel: 'Coral / Vocal',
-                coverEmoji: '🔔',
-                tempo: 130,
-                notes: [
-                    [293.66, 146.83, 1], [392.00, 196.00, 1], [392.00, 196.00, 0.5], [440.00, 196.00, 0.5], [392.00, 196.00, 0.5], [369.99, 146.83, 0.5],
-                    [329.63, 164.81, 1], [329.63, 164.81, 1], [329.63, 164.81, 1],
-                    [440.00, 146.83, 1], [440.00, 146.83, 0.5], [493.88, 196.00, 0.5], [440.00, 146.83, 0.5], [392.00, 196.00, 0.5],
-                    [369.99, 146.83, 1], [293.66, 146.83, 1], [293.66, 146.83, 1],
-                    [493.88, 196.00, 1], [493.88, 196.00, 0.5], [523.25, 130.81, 0.5], [493.88, 196.00, 0.5], [440.00, 146.83, 0.5],
-                    [392.00, 196.00, 1], [329.63, 164.81, 1], [293.66, 146.83, 1], [329.63, 164.81, 1], [440.00, 146.83, 1], [369.99, 146.83, 1], [392.00, 196.00, 3]
-                ]
-            },
-            {
-                id: 'drive-track-6',
-                title: 'Deck the Halls (Guitarra & Cascabeles)',
-                artist: 'Ensamble Acústico Austral',
-                album: 'Villancicos Acústicos',
-                folderId: 'folder-acusticos',
-                genre: 'acustico',
-                genreLabel: 'Acústico Brillante',
-                coverEmoji: '🌲',
-                tempo: 128,
-                notes: [
-                    [392.00, 130.81, 1.5], [349.23, 130.81, 0.5], [329.63, 130.81, 1], [293.66, 196.00, 1],
-                    [261.63, 130.81, 1], [293.66, 196.00, 1], [329.63, 130.81, 1], [261.63, 130.81, 1],
-                    [293.66, 196.00, 0.5], [329.63, 196.00, 0.5], [349.23, 196.00, 0.5], [293.66, 196.00, 0.5], [329.63, 130.81, 1.5], [293.66, 196.00, 0.5],
-                    [261.63, 130.81, 1], [246.94, 196.00, 1], [261.63, 130.81, 2]
-                ]
             }
         ];
 
-        // Caché de URLs Blob generadas
         const generatedAudioBlobs = {};
 
         function generateRichHolidayWavBlob(songBlueprint) {
@@ -739,9 +719,8 @@
                 return generatedAudioBlobs[songBlueprint.id];
             }
 
-            const sampleRate = 22050; // Rápido de generar y cubre hasta 11kHz de espectro
+            const sampleRate = 22050;
             const beatSec = 60 / songBlueprint.tempo;
-            // Repetimos la secuencia 2 veces para tener una pista más larga
             const fullNotes = [...songBlueprint.notes, ...songBlueprint.notes];
             let totalDuration = 0;
             fullNotes.forEach(n => totalDuration += n[2] * beatSec);
@@ -759,8 +738,8 @@
             writeStr(8, 'WAVE');
             writeStr(12, 'fmt ');
             view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true); // PCM
-            view.setUint16(22, 1, true); // Mono
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
             view.setUint32(24, sampleRate, true);
             view.setUint32(28, sampleRate * 2, true);
             view.setUint16(32, 2, true);
@@ -776,21 +755,17 @@
 
                 for (let s = 0; s < noteSamples && sampleIndex < numSamples; s++, sampleIndex++) {
                     const t = s / sampleRate;
-                    // Envolvente suave ADSR
                     const attack = Math.min(1, t / 0.04);
                     const release = Math.exp(-t * 2.4);
                     const env = attack * release;
 
-                    // 1. Sub-bajo cálido (60-200Hz) para probar banda 60Hz y 250Hz
                     const bassWave = Math.sin(2 * Math.PI * bassFreq * t) * 0.35 +
                                      Math.sin(2 * Math.PI * (bassFreq * 0.5) * t) * 0.22;
 
-                    // 2. Melodía y armónicos medios (1kHz)
                     const melodyWave = Math.sin(2 * Math.PI * melodyFreq * t) * 0.35 +
                                        Math.sin(2 * Math.PI * (melodyFreq * 2) * t) * 0.16 +
                                        Math.sin(2 * Math.PI * (melodyFreq * 3) * t) * 0.08;
 
-                    // 3. Armónico de campana / cascabel de alta frecuencia (4kHz - 8kHz)
                     const chimeEnv = Math.exp(-t * 7.5);
                     const chimeWave = (Math.sin(2 * Math.PI * (melodyFreq * 6) * t) * 0.09 +
                                        Math.sin(2 * Math.PI * 5200 * t) * 0.04) * chimeEnv;
@@ -807,12 +782,12 @@
         }
 
         /***********************************************************************
-         * 2. ESTADO DE LA APLICACIÓN Y ALMACENAMIENTO LOCAL (localStorage)
+         * 2. ESTADO GLOBAL Y GESTIÓN DE MEMORIA / CACHÉ
          ***********************************************************************/
         let state = {
-            currentView: 'all',        // 'all', 'folders', 'favorites', 'playlists', 'eq'
-            selectedFolder: null,      // Nombre de álbum seleccionado
-            selectedPlaylistId: null,  // ID de playlist seleccionada
+            currentView: 'all',
+            selectedFolder: null,
+            selectedPlaylistId: null,
             searchQuery: '',
             tracks: [],
             playlists: [],
@@ -820,16 +795,16 @@
             currentTrackIndex: -1,
             isPlaying: false,
             isShuffle: false,
-            repeatMode: 'none',        // 'none', 'all', 'one'
+            repeatMode: 'none',
             smartEqEnabled: true,
-            manualPreset: 'auto',
-            bandGains: [0, 0, 0, 0, 0], // 60Hz, 250Hz, 1kHz, 4kHz, 12kHz
+            bandGains: [0, 0, 0, 0, 0],
             googleAccessToken: null,
-            googleClientId: localStorage.getItem('noel_gdrive_client_id') || '',
-            googleFolderId: localStorage.getItem('noel_gdrive_folder_id') || ''
+            googleClientId: localStorage.getItem('noel_gdrive_client_id') || DEFAULT_CLIENT_ID,
+            googleFolderId: localStorage.getItem('noel_gdrive_folder_id') || DEFAULT_FOLDER_ID,
+            pendingTrackPlayAfterAuth: null,
+            activeDriveBlobUrl: null
         };
 
-        // Perfiles base para el Ecualizador Inteligente
         const EQ_PROFILES = {
             coral: {
                 name: 'Coral / Vocal',
@@ -858,47 +833,50 @@
             }
         };
 
+        function getDemoTracksList() {
+            return DEMO_SONGS_BLUEPRINT.map(item => {
+                const generated = generateRichHolidayWavBlob(item);
+                return {
+                    ...item,
+                    audioUrl: generated.url,
+                    duration: generated.duration,
+                    source: 'Demo Integrado'
+                };
+            });
+        }
+
         function loadInitialState() {
-            // Cargar favoritos y playlists guardadas en localStorage
+            // Asegurar que las credenciales por defecto estén en los inputs
+            document.getElementById('gdrive-client-id').value = state.googleClientId;
+            document.getElementById('gdrive-folder-id').value = state.googleFolderId;
+
             try {
                 const savedFavs = JSON.parse(localStorage.getItem('noel_favorites') || '[]');
-                state.favorites = Array.isArray(savedFavs) ? savedFavs : ['drive-track-1', 'drive-track-2'];
+                state.favorites = Array.isArray(savedFavs) ? savedFavs : [];
 
                 const savedPlaylists = JSON.parse(localStorage.getItem('noel_playlists') || 'null');
                 if (savedPlaylists && Array.isArray(savedPlaylists)) {
                     state.playlists = savedPlaylists;
                 } else {
                     state.playlists = [
-                        {
-                            id: 'pl-nochebuena',
-                            name: '✨ Cena de Nochebuena',
-                            trackIds: ['drive-track-1', 'drive-track-2', 'drive-track-3']
-                        },
-                        {
-                            id: 'pl-abrir-regalos',
-                            name: '🎁 Mañana de Regalos',
-                            trackIds: ['drive-track-4', 'drive-track-5', 'drive-track-6']
-                        }
+                        { id: 'pl-nochebuena', name: '✨ Cena de Nochebuena', trackIds: [] },
+                        { id: 'pl-regalos', name: '🎁 Mañana de Navidad', trackIds: [] }
                     ];
+                }
+
+                // Cargar biblioteca de Google Drive guardada en caché local si existe
+                const cachedDriveTracks = JSON.parse(localStorage.getItem('noel_cached_drive_tracks') || 'null');
+                if (cachedDriveTracks && Array.isArray(cachedDriveTracks) && cachedDriveTracks.length > 0) {
+                    state.tracks = cachedDriveTracks;
+                    document.getElementById('connection-badge').textContent = `Biblioteca Guardada (${cachedDriveTracks.length})`;
+                    document.getElementById('connection-badge').className = 'text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/40 font-medium whitespace-nowrap';
+                } else {
+                    state.tracks = getDemoTracksList();
                 }
             } catch (e) {
                 console.warn('Error leyendo localStorage:', e);
+                state.tracks = getDemoTracksList();
             }
-
-            // Construir canciones demo con audio WAV real generado al vuelo
-            state.tracks = DEMO_SONGS_BLUEPRINT.map(item => {
-                const generated = generateRichHolidayWavBlob(item);
-                return {
-                    ...item,
-                    audioUrl: generated.url,
-                    duration: generated.duration,
-                    source: 'Google Drive (Sincronizado)'
-                };
-            });
-
-            // Rellenar inputs del modal de Drive si estaban guardados
-            document.getElementById('gdrive-client-id').value = state.googleClientId;
-            document.getElementById('gdrive-folder-id').value = state.googleFolderId;
         }
 
         function savePersistentData() {
@@ -908,6 +886,26 @@
             } catch (e) {
                 console.warn('No se pudo guardar en localStorage:', e);
             }
+        }
+
+        function restoreDefaultCredentials() {
+            state.googleClientId = DEFAULT_CLIENT_ID;
+            state.googleFolderId = DEFAULT_FOLDER_ID;
+            localStorage.setItem('noel_gdrive_client_id', DEFAULT_CLIENT_ID);
+            localStorage.setItem('noel_gdrive_folder_id', DEFAULT_FOLDER_ID);
+            document.getElementById('gdrive-client-id').value = DEFAULT_CLIENT_ID;
+            document.getElementById('gdrive-folder-id').value = DEFAULT_FOLDER_ID;
+            showToast('Credenciales originales restauradas.', 'success');
+        }
+
+        function clearCachedDriveLibrary() {
+            localStorage.removeItem('noel_cached_drive_tracks');
+            state.tracks = getDemoTracksList();
+            state.currentTrackIndex = 0;
+            renderSidebarPlaylists();
+            renderMainContent();
+            closeDriveModal();
+            showToast('Caché limpiada. Puedes volver a sincronizar tu Drive.', 'info');
         }
 
         /***********************************************************************
@@ -933,7 +931,6 @@
                 const audioEl = document.getElementById('main-audio');
                 mediaSource = audioCtx.createMediaElementSource(audioEl);
 
-                // Crear las 5 bandas de ecualización
                 eqFilters = EQ_FREQUENCIES.map((freq, index) => {
                     const filter = audioCtx.createBiquadFilter();
                     if (index === 0) {
@@ -949,7 +946,6 @@
                     return filter;
                 });
 
-                // Compresor suave para evitar distorsión cuando el ecualizador sube ganancias
                 compressorNode = audioCtx.createDynamicsCompressor();
                 compressorNode.threshold.value = -14;
                 compressorNode.knee.value = 24;
@@ -957,13 +953,11 @@
                 compressorNode.attack.value = 0.005;
                 compressorNode.release.value = 0.20;
 
-                // Analizador FFT para visualizador y Smart Auto-EQ
                 analyserNode = audioCtx.createAnalyser();
                 analyserNode.fftSize = 256;
                 analyserNode.smoothingTimeConstant = 0.82;
                 frequencyData = new Uint8Array(analyserNode.frequencyBinCount);
 
-                // Conectar cadena: MediaElement -> Banda0 -> Banda1 -> Banda2 -> Banda3 -> Banda4 -> Compressor -> Analyser -> Altavoces
                 let prevNode = mediaSource;
                 eqFilters.forEach(filter => {
                     prevNode.connect(filter);
@@ -973,11 +967,9 @@
                 compressorNode.connect(analyserNode);
                 analyserNode.connect(audioCtx.destination);
 
-                // Iniciar bucle de visualización y auto-ajuste espectral
                 requestAnimationFrame(renderSpectrumAndSmartEQ);
             } catch (err) {
                 console.error('Error iniciando Web Audio API:', err);
-                showToast('Tu navegador restringió Web Audio API, reproduciendo audio directo.', 'warning');
             }
         }
 
@@ -997,7 +989,6 @@
                 if (slider) slider.value = gainVal;
                 if (label) label.textContent = `${gainVal >= 0 ? '+' : ''}${gainVal.toFixed(1)} dB`;
 
-                // También actualizar controles si la vista móvil de EQ está abierta
                 const mobSlider = document.getElementById(`mob-slider-band-${idx}`);
                 const mobLabel = document.getElementById(`mob-val-band-${idx}`);
                 if (mobSlider) mobSlider.value = gainVal;
@@ -1005,7 +996,6 @@
             });
         }
 
-        // Bucle en tiempo real: dibuja el analizador FFT y aplica micro-ajustes inteligentes
         let lastSmartAdjustTime = 0;
         function renderSpectrumAndSmartEQ(timestamp) {
             requestAnimationFrame(renderSpectrumAndSmartEQ);
@@ -1013,11 +1003,9 @@
             if (!analyserNode || !frequencyData) return;
             analyserNode.getByteFrequencyData(frequencyData);
 
-            // 1. Dibujar en el canvas lateral (y en el canvas móvil si existe)
             drawCanvasSpectrum('spectrum-canvas');
             drawCanvasSpectrum('mob-spectrum-canvas');
 
-            // 2. Si Smart Auto-EQ está activo y la música está sonando, balancear dinámicamente cada 450ms
             if (state.smartEqEnabled && state.isPlaying && timestamp - lastSmartAdjustTime > 450) {
                 lastSmartAdjustTime = timestamp;
                 const currentTrack = state.tracks[state.currentTrackIndex];
@@ -1025,7 +1013,6 @@
 
                 const baseProfile = EQ_PROFILES[currentTrack.genre] || EQ_PROFILES.coral;
 
-                // Medir energía en graves (bins 1-6), medios (bins 8-28) y agudos (bins 32-80)
                 let bassEnergy = 0, midEnergy = 0, highEnergy = 0;
                 for (let i = 1; i <= 6; i++) bassEnergy += frequencyData[i];
                 for (let i = 8; i <= 28; i++) midEnergy += frequencyData[i];
@@ -1035,7 +1022,6 @@
                 midEnergy /= 21;
                 highEnergy /= 49;
 
-                // Micro-compensación inteligente: si faltan graves o agudos en el pasaje, los impulsa sutilmente
                 const bassTrim = bassEnergy < 110 ? 1.2 : (bassEnergy > 210 ? -1.0 : 0.3);
                 const midTrim = midEnergy < 90 ? 1.0 : 0.0;
                 const highTrim = highEnergy < 65 ? 1.4 : -0.4;
@@ -1090,16 +1076,16 @@
 
         function detectTrackGenreByMetadata(title, album) {
             const text = `${title} ${album}`.toLowerCase();
-            if (text.includes('jazz') || text.includes('swing') || text.includes('sax') || text.includes('blues')) {
-                return { genre: 'jazz', genreLabel: 'Jazz Cálido' };
+            if (text.includes('jazz') || text.includes('swing') || text.includes('sax') || text.includes('blues') || text.includes('buble') || text.includes('sinatra')) {
+                return { genre: 'jazz', genreLabel: 'Jazz Cálido', emoji: '🎷' };
             }
-            if (text.includes('acústic') || text.includes('guitar') || text.includes('campana') || text.includes('celesta')) {
-                return { genre: 'acustico', genreLabel: 'Acústico Brillante' };
+            if (text.includes('acústic') || text.includes('acoustic') || text.includes('guitar') || text.includes('campana') || text.includes('celesta') || text.includes('instrum')) {
+                return { genre: 'acustico', genreLabel: 'Acústico Brillante', emoji: '🎸' };
             }
-            if (text.includes('pop') || text.includes('rock') || text.includes('synth') || text.includes('dance')) {
-                return { genre: 'pop', genreLabel: 'Pop Dinámico' };
+            if (text.includes('pop') || text.includes('rock') || text.includes('synth') || text.includes('dance') || text.includes('mariah') || text.includes('wham')) {
+                return { genre: 'pop', genreLabel: 'Pop Dinámico', emoji: '🦌' };
             }
-            return { genre: 'coral', genreLabel: 'Coral / Vocal' };
+            return { genre: 'coral', genreLabel: 'Coral / Clásico', emoji: '🎄' };
         }
 
         function toggleSmartEQ() {
@@ -1109,9 +1095,7 @@
             if (state.smartEqEnabled) {
                 document.getElementById('eq-preset-select').value = 'auto';
                 const currentTrack = state.tracks[state.currentTrackIndex];
-                if (currentTrack) {
-                    applySmartProfileForTrack(currentTrack);
-                }
+                if (currentTrack) applySmartProfileForTrack(currentTrack);
                 showToast('✨ Smart Auto-EQ activado: ajuste espectral automático.', 'success');
             } else {
                 showToast('Modo Ecualizador Manual activado.', 'info');
@@ -1187,28 +1171,103 @@
         }
 
         /***********************************************************************
-         * 4. REPRODUCTOR Y MEDIA SESSION API (PANTALLA BLOQUEADA DEL CELULAR)
+         * 4. REPRODUCCIÓN Y STREAMING AUTENTICADO DESDE GOOGLE DRIVE
          ***********************************************************************/
         const audioEl = document.getElementById('main-audio');
         let isDraggingSeek = false;
+        let currentStreamAbortController = null;
 
-        function playTrackByIndex(index) {
+        function setStreamLoadingBanner(visible, message = 'Cargando stream desde Google Drive...') {
+            const banner = document.getElementById('stream-loading-banner');
+            const textEl = document.getElementById('stream-loading-text');
+            if (textEl) textEl.textContent = message;
+            if (visible) {
+                banner.classList.remove('hidden');
+                banner.classList.add('flex');
+            } else {
+                banner.classList.add('hidden');
+                banner.classList.remove('flex');
+            }
+        }
+
+        async function playTrackByIndex(index) {
             if (index < 0 || index >= state.tracks.length) return;
             initWebAudioEngine();
 
             state.currentTrackIndex = index;
             const track = state.tracks[index];
 
+            updatePlayerBarUI();
+            applySmartProfileForTrack(track);
+            renderMainContent();
+
+            // Si la canción proviene de Google Drive y requiere autenticación Bearer
+            if (track.driveFileId) {
+                if (!state.googleAccessToken) {
+                    state.pendingTrackPlayAfterAuth = index;
+                    showToast('Autorizando sesión de Google Drive para reproducir...', 'info');
+                    handleOneTouchDriveClick();
+                    return;
+                }
+
+                try {
+                    if (currentStreamAbortController) {
+                        currentStreamAbortController.abort();
+                    }
+                    currentStreamAbortController = new AbortController();
+
+                    setStreamLoadingBanner(true, `Transmitiendo "${track.title}" desde Drive...`);
+
+                    const streamUrl = `https://www.googleapis.com/drive/v3/files/${track.driveFileId}?alt=media`;
+                    const res = await fetch(streamUrl, {
+                        headers: { 'Authorization': `Bearer ${state.googleAccessToken}` },
+                        signal: currentStreamAbortController.signal
+                    });
+
+                    if (res.status === 401 || res.status === 403) {
+                        setStreamLoadingBanner(false);
+                        state.googleAccessToken = null;
+                        state.pendingTrackPlayAfterAuth = index;
+                        showToast('Tu sesión de Drive expiró. Reconectando...', 'warning');
+                        handleOneTouchDriveClick();
+                        return;
+                    }
+
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                    const audioBlob = await res.blob();
+                    // Liberar el Blob anterior de memoria para cuidar la RAM del celular
+                    if (state.activeDriveBlobUrl) {
+                        URL.revokeObjectURL(state.activeDriveBlobUrl);
+                    }
+                    state.activeDriveBlobUrl = URL.createObjectURL(audioBlob);
+                    audioEl.src = state.activeDriveBlobUrl;
+
+                    setStreamLoadingBanner(false);
+                    await audioEl.play();
+                    state.isPlaying = true;
+                    updatePlayerBarUI();
+                    updateMediaSessionMetadata(track);
+                    renderMainContent();
+                } catch (err) {
+                    setStreamLoadingBanner(false);
+                    if (err.name === 'AbortError') return;
+                    console.error('Error en streaming de Drive:', err);
+                    showToast('No se pudo transmitir el archivo. Verifica tu conexión.', 'warning');
+                }
+                return;
+            }
+
+            // Reproducción directa para pistas Demo o Archivos Locales
             audioEl.src = track.audioUrl;
             audioEl.play().then(() => {
                 state.isPlaying = true;
                 updatePlayerBarUI();
-                applySmartProfileForTrack(track);
                 updateMediaSessionMetadata(track);
                 renderMainContent();
             }).catch(err => {
                 console.warn('Error al reproducir pista:', err);
-                showToast('Haz clic en Play para autorizar el audio en tu navegador.', 'info');
+                showToast('Toca Play para iniciar la reproducción.', 'info');
             });
         }
 
@@ -1216,6 +1275,11 @@
             initWebAudioEngine();
             if (state.currentTrackIndex === -1 && state.tracks.length > 0) {
                 playTrackByIndex(0);
+                return;
+            }
+            const currentTrack = state.tracks[state.currentTrackIndex];
+            if (!audioEl.src && currentTrack) {
+                playTrackByIndex(state.currentTrackIndex);
                 return;
             }
             if (audioEl.paused) {
@@ -1271,8 +1335,8 @@
             state.isShuffle = !state.isShuffle;
             const btn = document.getElementById('btn-shuffle');
             btn.className = state.isShuffle
-                ? 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition'
-                : 'p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition';
+                ? 'p-1.5 sm:p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition hidden sm:inline-flex'
+                : 'p-1.5 sm:p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition hidden sm:inline-flex';
             showToast(state.isShuffle ? 'Modo Aleatorio activado' : 'Modo Aleatorio desactivado', 'info');
         }
 
@@ -1285,13 +1349,13 @@
             const badge = document.getElementById('repeat-one-badge');
 
             if (next === 'none') {
-                btn.className = 'p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative';
+                btn.className = 'p-1.5 sm:p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative hidden sm:inline-flex';
                 badge.classList.add('hidden');
             } else if (next === 'all') {
-                btn.className = 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative';
+                btn.className = 'p-1.5 sm:p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative hidden sm:inline-flex';
                 badge.classList.add('hidden');
             } else {
-                btn.className = 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative';
+                btn.className = 'p-1.5 sm:p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative hidden sm:inline-flex';
                 badge.classList.remove('hidden');
             }
         }
@@ -1322,6 +1386,13 @@
             }
         }
 
+        audioEl.addEventListener('loadedmetadata', () => {
+            if (audioEl.duration && state.tracks[state.currentTrackIndex]) {
+                state.tracks[state.currentTrackIndex].duration = Math.round(audioEl.duration);
+                document.getElementById('total-duration').textContent = formatSeconds(audioEl.duration);
+            }
+        });
+
         audioEl.addEventListener('timeupdate', () => {
             if (isDraggingSeek || !audioEl.duration) return;
             const percent = (audioEl.currentTime / audioEl.duration) * 100;
@@ -1350,7 +1421,6 @@
             }
         });
 
-        // Configuración de MediaSession API para bloqueo de pantalla en Android / iOS / PC
         function updateMediaSessionMetadata(track) {
             if (!('mediaSession' in navigator)) return;
 
@@ -1388,7 +1458,7 @@
         }
 
         /***********************************************************************
-         * 5. VISTAS DE BIBLIOTECA, CARPETAS Y LISTAS DE REPRODUCCIÓN
+         * 5. VISTAS DE BIBLIOTECA, SUBCARPETAS Y LISTAS DE REPRODUCCIÓN
          ***********************************************************************/
         function switchView(viewName, folderOrPlaylistId = null) {
             state.currentView = viewName;
@@ -1398,7 +1468,6 @@
                 state.selectedPlaylistId = folderOrPlaylistId;
             }
 
-            // Actualizar estilos de navegación lateral
             ['all', 'folders', 'favorites'].forEach(id => {
                 const el = document.getElementById(`nav-${id}`);
                 if (!el) return;
@@ -1409,8 +1478,7 @@
                 }
             });
 
-            // Navegación móvil
-            ['all', 'folders', 'playlists', 'eq'].forEach(id => {
+            ['all', 'folders', 'favorites', 'playlists', 'eq'].forEach(id => {
                 const mobEl = document.getElementById(`mob-nav-${id}`);
                 if (!mobEl) return;
                 if (id === viewName) {
@@ -1529,15 +1597,15 @@
                 return;
             }
 
-            // Vista de Carpetas / Álbumes de Google Drive
+            // Vista de Subcarpetas / Álbumes de Google Drive
             if (state.currentView === 'folders' && !state.selectedFolder) {
-                titleEl.textContent = 'Subcarpetas de Álbumes en Drive';
-                subEl.textContent = 'Selecciona un álbum navideño para explorar sus pistas';
+                titleEl.textContent = 'Álbumes y Subcarpetas de Navidad';
+                subEl.textContent = 'Subcarpetas indexadas desde tu carpeta de Google Drive';
 
                 const albumsMap = {};
                 state.tracks.forEach(t => {
                     if (!albumsMap[t.album]) {
-                        albumsMap[t.album] = { name: t.album, count: 0, emoji: t.coverEmoji, genreLabel: t.genreLabel };
+                        albumsMap[t.album] = { name: t.album, count: 0, emoji: t.coverEmoji || '🎄', genreLabel: t.genreLabel };
                     }
                     albumsMap[t.album].count++;
                 });
@@ -1548,16 +1616,16 @@
                         ${albums.map(alb => `
                             <div onclick="switchView('folders', '${alb.name.replace(/'/g, "\\'")}')"
                                  class="glass-panel p-5 rounded-3xl border border-gold-500/20 hover:border-gold-400/60 transition cursor-pointer group flex items-center gap-4">
-                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-crimson-700/60 to-pine-800 flex items-center justify-center text-3xl shadow-inner border border-gold-500/30 group-hover:scale-105 transition">
+                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-crimson-700/60 to-pine-800 flex items-center justify-center text-3xl shadow-inner border border-gold-500/30 group-hover:scale-105 transition shrink-0">
                                     ${alb.emoji}
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-1.5 text-[10px] text-gold-400 uppercase tracking-wider font-semibold">
                                         <i data-lucide="folder" class="w-3.5 h-3.5"></i>
-                                        <span>Subcarpeta Drive</span>
+                                        <span>Álbum / Carpeta</span>
                                     </div>
                                     <h3 class="font-serif text-base font-bold text-stone-100 truncate mt-0.5">${alb.name}</h3>
-                                    <p class="text-xs text-stone-400 mt-1">${alb.count} canciones • Perfil ${alb.genreLabel}</p>
+                                    <p class="text-xs text-stone-400 mt-1">${alb.count} canciones • ${alb.genreLabel}</p>
                                 </div>
                             </div>
                         `).join('')}
@@ -1567,7 +1635,7 @@
                 return;
             }
 
-            // Vista de Listas de Reproducción en Móvil (cuando aún no se ha elegido una)
+            // Vista de Listas de Reproducción en Móvil
             if (state.currentView === 'playlists' && !state.selectedPlaylistId) {
                 titleEl.textContent = 'Tus Listas de Reproducción';
                 subEl.textContent = 'Crea y organiza tus sesiones navideñas';
@@ -1589,36 +1657,56 @@
                 return;
             }
 
-            // Encabezados contextuales para listado de canciones
             if (state.currentView === 'all') {
                 titleEl.textContent = 'Todas las Canciones';
-                subEl.textContent = 'Streaming instantáneo desde tu biblioteca de Google Drive';
+                subEl.textContent = state.googleAccessToken
+                    ? 'Conectado a tu carpeta de Google Drive • Streaming directo activo'
+                    : 'Toca "Conectar mi Drive" arriba a la derecha para cargar tus álbumes reales';
             } else if (state.currentView === 'favorites') {
                 titleEl.textContent = 'Favoritos Navideños';
                 subEl.textContent = 'Tus villancicos y temas preferidos';
             } else if (state.currentView === 'folders' && state.selectedFolder) {
                 titleEl.textContent = state.selectedFolder;
                 subEl.textContent = 'Subcarpeta de Google Drive';
-                pillEl.textContent = '← Volver a Carpetas';
+                pillEl.textContent = '← Volver a Álbumes';
                 pillEl.classList.remove('hidden');
                 pillEl.className = 'text-xs px-3 py-1 rounded-full bg-pine-800 hover:bg-pine-700 text-gold-300 border border-gold-500/30 cursor-pointer';
                 pillEl.onclick = () => switchView('folders', null);
             } else if (state.currentView === 'playlists' && state.selectedPlaylistId) {
                 const pl = state.playlists.find(p => p.id === state.selectedPlaylistId);
                 titleEl.textContent = pl ? pl.name : 'Lista de Reproducción';
-                subEl.textContent = 'Lista personalizada guardada en tu dispositivo';
+                subEl.textContent = 'Lista personalizada guardada en tu navegador';
             }
 
             const tracks = getFilteredTracks();
 
+            // Banner de invitación rápida si aún no ha iniciado sesión en esta sesión
+            const quickConnectCard = !state.googleAccessToken ? `
+                <div class="glass-panel p-4 rounded-2xl border border-gold-400/40 bg-gradient-to-r from-pine-900/90 via-pine-800/60 to-crimson-700/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gold-500/20 border border-gold-400/40 flex items-center justify-center text-gold-300 shrink-0">
+                            <i data-lucide="folder-sync" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-bold text-stone-100">Tu Carpeta de Navidad de Google Drive está lista</h4>
+                            <p class="text-[11px] text-stone-300">Conecta tu cuenta con un toque para sincronizar tus subcarpetas y reproducir en streaming.</p>
+                        </div>
+                    </div>
+                    <button onclick="handleOneTouchDriveClick()" class="w-full sm:w-auto px-4 py-2 rounded-xl bg-gold-500 hover:bg-gold-400 text-pine-950 font-bold text-xs transition shrink-0 shadow-md">
+                        Conectar Google Drive Ahora
+                    </button>
+                </div>
+            ` : '';
+
             if (tracks.length === 0) {
                 area.innerHTML = `
+                    ${quickConnectCard}
                     <div class="glass-panel rounded-3xl p-10 text-center space-y-3 border border-gold-500/15">
                         <div class="w-12 h-12 rounded-2xl bg-gold-500/10 text-gold-400 flex items-center justify-center mx-auto">
                             <i data-lucide="music-2" class="w-6 h-6"></i>
                         </div>
-                        <p class="text-sm font-semibold text-stone-200">No se encontraron canciones en esta vista</p>
-                        <p class="text-xs text-stone-400 max-w-sm mx-auto">Prueba buscando otro término, agregando canciones a la lista o subiendo tus propios archivos MP3.</p>
+                        <p class="text-sm font-semibold text-stone-200">No hay canciones en esta sección</p>
+                        <p class="text-xs text-stone-400 max-w-sm mx-auto">Conecta tu Google Drive o agrega canciones a esta lista usando el botón "+" en cualquier pista.</p>
                     </div>
                 `;
                 lucide.createIcons();
@@ -1626,6 +1714,7 @@
             }
 
             area.innerHTML = `
+                ${quickConnectCard}
                 <div class="space-y-2">
                     ${tracks.map(track => {
                         const globalIdx = state.tracks.findIndex(t => t.id === track.id);
@@ -1634,10 +1723,10 @@
 
                         return `
                             <div onclick="playTrackByIndex(${globalIdx})"
-                                 class="group glass-panel px-3.5 py-3 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${isCurrent ? 'border-gold-400/70 bg-gold-500/10' : 'border-gold-500/10 hover:border-gold-500/35 hover:bg-pine-900/60'}">
+                                 class="group glass-panel px-3.5 py-2.5 sm:py-3 rounded-2xl border transition cursor-pointer flex items-center justify-between gap-3 ${isCurrent ? 'border-gold-400/70 bg-gold-500/10' : 'border-gold-500/10 hover:border-gold-500/35 hover:bg-pine-900/60'}">
                                 
-                                <div class="flex items-center gap-3.5 min-w-0 flex-1">
-                                    <div class="w-11 h-11 rounded-xl bg-pine-950 border border-gold-500/25 flex items-center justify-center text-lg shrink-0 relative">
+                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                    <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-pine-950 border border-gold-500/25 flex items-center justify-center text-lg shrink-0 relative">
                                         <span>${track.coverEmoji || '🎄'}</span>
                                         ${isCurrent && state.isPlaying ? `
                                             <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-gold-500 text-pine-950 flex items-center justify-center">
@@ -1651,20 +1740,20 @@
                                             <p class="text-xs sm:text-sm font-semibold truncate ${isCurrent ? 'text-gold-300' : 'text-stone-100'}">
                                                 ${track.title}
                                             </p>
-                                            <span class="hidden md:inline-block text-[10px] px-2 py-0.5 rounded-full bg-pine-950/90 text-gold-300 border border-gold-500/20">
+                                            <span class="hidden md:inline-block text-[10px] px-2 py-0.5 rounded-full bg-pine-950/90 text-gold-300 border border-gold-500/20 shrink-0">
                                                 Auto-EQ: ${track.genreLabel}
                                             </span>
                                         </div>
                                         <div class="flex items-center gap-2 text-[11px] text-stone-400 truncate mt-0.5">
-                                            <span>${track.artist}</span>
+                                            <span class="truncate">${track.album}</span>
                                             <span>•</span>
-                                            <span class="text-stone-300">${track.album}</span>
+                                            <span class="text-stone-500">${track.driveFileId ? 'Google Drive' : track.artist}</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="flex items-center gap-1.5 sm:gap-2 shrink-0" onclick="event.stopPropagation()">
-                                    <span class="text-xs font-mono text-stone-400 hidden sm:inline mr-1">${formatSeconds(track.duration)}</span>
+                                <div class="flex items-center gap-1 sm:gap-2 shrink-0" onclick="event.stopPropagation()">
+                                    ${track.duration ? `<span class="text-xs font-mono text-stone-400 hidden sm:inline mr-1">${formatSeconds(track.duration)}</span>` : ''}
 
                                     <button onclick="toggleFavorite('${track.id}')" title="Favorito"
                                         class="p-2 rounded-xl hover:bg-white/5 transition ${isFav ? 'text-crimson-500' : 'text-stone-400 hover:text-stone-200'}">
@@ -1809,7 +1898,6 @@
             showToast('Canción quitada de la lista.', 'info');
         }
 
-        // Subir archivos de audio locales para probar el Smart Auto-EQ
         document.getElementById('local-file-input').addEventListener('change', (e) => {
             const files = Array.from(e.target.files || []);
             if (files.length === 0) return;
@@ -1823,11 +1911,11 @@
                     id: 'local-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
                     title: cleanName,
                     artist: 'Mi Dispositivo',
-                    album: 'Archivos Subidos',
+                    album: 'Archivos Locales',
                     genre: detected.genre,
                     genreLabel: detected.genreLabel,
                     coverEmoji: '🎧',
-                    duration: 180,
+                    duration: 0,
                     audioUrl: url,
                     source: 'Local'
                 });
@@ -1836,11 +1924,11 @@
             renderSidebarPlaylists();
             renderMainContent();
             playTrackByIndex(0);
-            showToast(`${files.length} archivo(s) cargados y listos con Smart Auto-EQ.`, 'success');
+            showToast(`${files.length} archivo(s) locales listos con Smart Auto-EQ.`, 'success');
         });
 
         /***********************************************************************
-         * 7. INTEGRACIÓN CON GOOGLE DRIVE API v3 (OAuth 2.0 Real + Modo Demo)
+         * 7. CONEXIÓN EN 1 TOQUE Y ESCÁNER DE SUBCARPETAS GOOGLE DRIVE API v3
          ***********************************************************************/
         function openDriveModal() {
             document.getElementById('drive-modal').classList.remove('hidden');
@@ -1852,33 +1940,16 @@
             document.getElementById('drive-modal').classList.remove('flex');
         }
 
-        function simulateDriveScan() {
-            closeDriveModal();
-            showToast('Escaneando subcarpetas navideñas en Google Drive...', 'info');
-            setTimeout(() => {
-                document.getElementById('connection-badge').textContent = 'Google Drive Sincronizado';
-                document.getElementById('connection-badge').className = 'text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-medium';
-                showToast('¡4 subcarpetas de álbumes navideños indexadas en tu biblioteca!', 'success');
-                switchView('folders');
-            }, 700);
-        }
+        // Botón principal de 1 toque: inicia sesión con tus IDs preconfigurados sin abrir modales
+        function handleOneTouchDriveClick() {
+            const clientId = (document.getElementById('gdrive-client-id').value || DEFAULT_CLIENT_ID).trim();
+            const folderId = (document.getElementById('gdrive-folder-id').value || DEFAULT_FOLDER_ID).trim();
 
-        function authenticateRealGoogleDrive() {
-            const clientId = document.getElementById('gdrive-client-id').value.trim();
-            const folderId = document.getElementById('gdrive-folder-id').value.trim();
-
-            if (!clientId) {
-                showToast('Para usar OAuth real, ingresa tu Google Client ID o usa "Sincronizar Carpetas Demo".', 'warning');
-                return;
-            }
-
-            localStorage.setItem('noel_gdrive_client_id', clientId);
-            localStorage.setItem('noel_gdrive_folder_id', folderId);
             state.googleClientId = clientId;
             state.googleFolderId = folderId;
 
             if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
-                showToast('El script de Google Identity aún está cargando. Intenta en 2 segundos.', 'warning');
+                showToast('Cargando módulo de Google Sign-In, intenta en 2 segundos...', 'warning');
                 return;
             }
 
@@ -1890,70 +1961,143 @@
                         if (tokenResponse && tokenResponse.access_token) {
                             state.googleAccessToken = tokenResponse.access_token;
                             closeDriveModal();
-                            await fetchRealDriveAudioFiles(tokenResponse.access_token, folderId);
+
+                            document.getElementById('drive-btn-label').textContent = 'Sincronizar Drive';
+                            document.getElementById('connection-badge').textContent = 'Drive Conectado';
+                            document.getElementById('connection-badge').className = 'text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-medium whitespace-nowrap';
+
+                            // Si el usuario había tocado Play en una canción guardada en caché, reproducirla de inmediato
+                            if (state.pendingTrackPlayAfterAuth !== null) {
+                                const targetIdx = state.pendingTrackPlayAfterAuth;
+                                state.pendingTrackPlayAfterAuth = null;
+                                playTrackByIndex(targetIdx);
+                                return;
+                            }
+
+                            await scanDriveFolderAndSubfolders(tokenResponse.access_token, folderId);
                         }
                     }
                 });
-                tokenClient.requestAccessToken({ prompt: 'consent' });
+
+                // Solicitar token (si ya autorizó antes, es instantáneo)
+                tokenClient.requestAccessToken({ prompt: '' });
             } catch (err) {
-                console.error(err);
-                showToast('Error al iniciar OAuth2. Verifica que tu Client ID sea válido.', 'warning');
+                console.error('Error iniciando OAuth2:', err);
+                showToast('Recuerda abrir la app desde tu URL https:// de GitHub Pages.', 'warning');
             }
         }
 
-        async function fetchRealDriveAudioFiles(accessToken, rootFolderId) {
-            showToast('Conectado a Google Drive. Buscando música navideña...', 'info');
-            try {
-                let q = "mimeType contains 'audio/' and trashed = false";
-                if (rootFolderId) {
-                    q = `'${rootFolderId}' in parents and mimeType contains 'audio/' and trashed = false`;
-                }
+        function authenticateRealGoogleDrive() {
+            const clientId = document.getElementById('gdrive-client-id').value.trim() || DEFAULT_CLIENT_ID;
+            const folderId = document.getElementById('gdrive-folder-id').value.trim() || DEFAULT_FOLDER_ID;
+            localStorage.setItem('noel_gdrive_client_id', clientId);
+            localStorage.setItem('noel_gdrive_folder_id', folderId);
+            handleOneTouchDriveClick();
+        }
 
-                const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,mimeType,parents)&pageSize=100`;
+        // Helper para consultar todas las páginas de Google Drive API v3
+        async function fetchAllDriveItems(accessToken, query, fields = 'files(id,name,mimeType,parents,size)') {
+            let allFiles = [];
+            let pageToken = '';
+            do {
+                const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=nextPageToken,${fields}&pageSize=100${pageToken ? '&pageToken=' + pageToken : ''}`;
                 const res = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${accessToken}` }
                 });
-
-                if (!res.ok) throw new Error('Error consultando Google Drive API');
+                if (!res.ok) throw new Error(`Drive API error ${res.status}`);
                 const data = await res.json();
-                const files = data.files || [];
+                if (data.files) allFiles.push(...data.files);
+                pageToken = data.nextPageToken || '';
+            } while (pageToken);
+            return allFiles;
+        }
 
-                if (files.length === 0) {
-                    showToast('No se encontraron archivos de audio directos en esa carpeta.', 'warning');
-                    return;
-                }
+        // Escanea la carpeta raíz de Navidad, todas sus subcarpetas (álbumes) y sus archivos de audio
+        async function scanDriveFolderAndSubfolders(accessToken, rootFolderId) {
+            setStreamLoadingBanner(true, 'Escaneando subcarpetas y álbumes en tu Google Drive...');
+            try {
+                const folderNameMap = {};
+                folderNameMap[rootFolderId] = 'Carpeta Principal Navidad';
 
-                for (const file of files) {
-                    const cleanTitle = file.name.replace(/\.[^/.]+$/, '');
-                    const detected = detectTrackGenreByMetadata(cleanTitle, 'Google Drive');
+                // 1. Buscar subcarpetas de 1er nivel (Álbumes dentro de tu carpeta de Navidad)
+                const subFoldersQuery = `'${rootFolderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+                const firstLevelFolders = await fetchAllDriveItems(accessToken, subFoldersQuery, 'files(id,name,parents)');
 
-                    // Para que el <audio> y Web Audio API puedan procesarlo con Authorization Bearer,
-                    // descargamos el stream como Blob en memoria bajo demanda o creamos un endpoint autorizado
-                    const streamUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`;
+                firstLevelFolders.forEach(f => {
+                    folderNameMap[f.id] = f.name;
+                });
 
-                    state.tracks.unshift({
-                        id: 'gdrive-' + file.id,
-                        driveFileId: file.id,
-                        title: cleanTitle,
-                        artist: 'Google Drive Cloud',
-                        album: 'Mi Carpeta Navideña Drive',
-                        genre: detected.genre,
-                        genreLabel: detected.genreLabel,
-                        coverEmoji: '☁️',
-                        duration: 210,
-                        audioUrl: streamUrl,
-                        requiresAuthHeader: true
+                // 2. Si hay subcarpetas de 2do nivel (ej. CD1 / CD2 dentro de un álbum), también las incluimos
+                const allFolderIds = [rootFolderId, ...firstLevelFolders.map(f => f.id)];
+                if (firstLevelFolders.length > 0) {
+                    const batchParents = firstLevelFolders.slice(0, 25).map(f => `'${f.id}' in parents`).join(' or ');
+                    const secondLevelQuery = `(${batchParents}) and mimeType = 'application/vnd.google-apps.folder' and trashed = false`;
+                    const secondLevelFolders = await fetchAllDriveItems(accessToken, secondLevelQuery, 'files(id,name,parents)');
+                    secondLevelFolders.forEach(sf => {
+                        const parentName = sf.parents && folderNameMap[sf.parents[0]] ? `${folderNameMap[sf.parents[0]]} - ` : '';
+                        folderNameMap[sf.id] = `${parentName}${sf.name}`;
+                        allFolderIds.push(sf.id);
                     });
                 }
 
-                document.getElementById('connection-badge').textContent = `Drive Conectado (${files.length} pistas)`;
-                document.getElementById('connection-badge').className = 'text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-medium';
+                // 3. Buscar todos los archivos de audio dentro de la carpeta raíz y todas las subcarpetas (en bloques de 20 carpetas por consulta)
+                let discoveredAudioFiles = [];
+                const chunkSize = 20;
+                for (let i = 0; i < allFolderIds.length; i += chunkSize) {
+                    const chunkIds = allFolderIds.slice(i, i + chunkSize);
+                    const parentsClause = chunkIds.map(id => `'${id}' in parents`).join(' or ');
+                    const audioQuery = `(${parentsClause}) and (mimeType contains 'audio/' or name contains '.mp3' or name contains '.m4a' or name contains '.wav' or name contains '.flac' or name contains '.ogg') and mimeType != 'application/vnd.google-apps.folder' and trashed = false`;
+                    const chunkFiles = await fetchAllDriveItems(accessToken, audioQuery);
+                    discoveredAudioFiles.push(...chunkFiles);
+                }
+
+                setStreamLoadingBanner(false);
+
+                if (discoveredAudioFiles.length === 0) {
+                    showToast('No se encontraron pistas de audio en la carpeta indicada.', 'warning');
+                    return;
+                }
+
+                // Ordenar alfabéticamente por álbum y nombre de pista
+                const mappedTracks = discoveredAudioFiles.map(file => {
+                    const cleanTitle = file.name.replace(/\.[^/.]+$/, '');
+                    const parentId = (file.parents && file.parents[0]) ? file.parents[0] : rootFolderId;
+                    const albumName = folderNameMap[parentId] || 'Álbum Navideño Drive';
+                    const detected = detectTrackGenreByMetadata(cleanTitle, albumName);
+
+                    return {
+                        id: 'gdrive-' + file.id,
+                        driveFileId: file.id,
+                        title: cleanTitle,
+                        artist: albumName,
+                        album: albumName,
+                        genre: detected.genre,
+                        genreLabel: detected.genreLabel,
+                        coverEmoji: detected.emoji,
+                        duration: 0,
+                        source: 'Google Drive'
+                    };
+                }).sort((a, b) => a.album.localeCompare(b.album) || a.title.localeCompare(b.title));
+
+                state.tracks = mappedTracks;
+                state.currentTrackIndex = 0;
+
+                // Guardar la biblioteca indexada en localStorage para que cargue al instante al abrir la app
+                try {
+                    localStorage.setItem('noel_cached_drive_tracks', JSON.stringify(mappedTracks));
+                } catch (e) {}
+
+                const totalAlbums = new Set(mappedTracks.map(t => t.album)).size;
+                document.getElementById('connection-badge').textContent = `${mappedTracks.length} Pistas en Drive`;
+
                 renderSidebarPlaylists();
                 renderMainContent();
-                showToast(`¡${files.length} canciones importadas desde tu Google Drive!`, 'success');
+                updatePlayerBarUI();
+                showToast(`¡${mappedTracks.length} canciones en ${totalAlbums} álbum(es) sincronizadas desde tu Drive!`, 'success');
             } catch (err) {
-                console.error(err);
-                showToast('No se pudo listar archivos. Verifica que Google Drive API esté activa en tu proyecto Cloud.', 'warning');
+                setStreamLoadingBanner(false);
+                console.error('Error escaneando carpetas de Drive:', err);
+                showToast('Error al leer la carpeta. Verifica permisos en Google Drive.', 'warning');
             }
         }
 
@@ -1983,10 +2127,9 @@
             setTimeout(() => {
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 300);
-            }, 3200);
+            }, 3400);
         }
 
-        // Buscador en tiempo real
         const searchInput = document.getElementById('search-input');
         const clearSearchBtn = document.getElementById('clear-search-btn');
 
@@ -2007,7 +2150,6 @@
             renderMainContent();
         });
 
-        // Decoración sutil de copos de nieve
         function createFestiveSnowflakes() {
             const container = document.getElementById('snow-container');
             const count = 18;
@@ -2023,7 +2165,6 @@
             }
         }
 
-        // Inicialización al cargar la ventana
         window.onload = function () {
             createFestiveSnowflakes();
             loadInitialState();
@@ -2031,7 +2172,6 @@
             renderMainContent();
             syncSmartEQUi();
 
-            // Pre-seleccionar la primera canción en la barra sin forzar autoplay bloqueado
             if (state.tracks.length > 0) {
                 state.currentTrackIndex = 0;
                 updatePlayerBarUI();
