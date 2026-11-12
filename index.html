@@ -10,8 +10,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Identity Services (OAuth 2.0 oficial) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <!-- Google Fonts: Inter & Playfair Display -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Inter, Playfair Display & VT323 (Winamp 1998 LCD) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
@@ -21,6 +21,7 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         serif: ['Playfair Display', 'serif'],
+                        lcd: ['VT323', 'monospace'],
                     },
                     colors: {
                         pine: {
@@ -132,6 +133,128 @@
             z-index: 1;
             animation: snowFall linear infinite;
         }
+
+        /* =====================================================================
+           ESTILOS CLÁSICOS WINAMP 2.91 (1998 METALLIC BEVEL & GREEN LCD)
+           ===================================================================== */
+        .winamp-window {
+            background: linear-gradient(180deg, #3a3a4c 0%, #252533 100%);
+            border-top: 2px solid #6e6e85;
+            border-left: 2px solid #6e6e85;
+            border-right: 2px solid #12121a;
+            border-bottom: 2px solid #12121a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85), inset 1px 1px 0 #4d4d63;
+            font-family: 'Tahoma', 'Inter', sans-serif;
+        }
+
+        .winamp-titlebar {
+            background: linear-gradient(90deg, #1b2845 0%, #3a5078 25%, #8c733e 50%, #3a5078 75%, #1b2845 100%);
+            border-top: 1px solid #a89464;
+            border-bottom: 1px solid #0d1321;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 6px;
+            color: #e6d5a7;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .winamp-lcd {
+            background-color: #000000;
+            border-top: 2px solid #12121a;
+            border-left: 2px solid #12121a;
+            border-right: 2px solid #57576b;
+            border-bottom: 2px solid #57576b;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.12);
+            color: #00ff00;
+            font-family: 'VT323', monospace;
+        }
+
+        .winamp-btn {
+            background: linear-gradient(180deg, #c2c6ca 0%, #85898d 100%);
+            border-top: 2px solid #f0f2f5;
+            border-left: 2px solid #f0f2f5;
+            border-right: 2px solid #2b2d30;
+            border-bottom: 2px solid #2b2d30;
+            color: #111317;
+            font-weight: 700;
+            font-size: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: 1px 1px 0 #000;
+        }
+        .winamp-btn:hover {
+            background: linear-gradient(180deg, #d4d8dc 0%, #969a9e 100%);
+        }
+        .winamp-btn:active, .winamp-btn.active-bevel {
+            background: linear-gradient(180deg, #6e7276 0%, #9da1a5 100%);
+            border-top: 2px solid #2b2d30;
+            border-left: 2px solid #2b2d30;
+            border-right: 2px solid #d4d8dc;
+            border-bottom: 2px solid #d4d8dc;
+            transform: translate(1px, 1px);
+        }
+
+        .winamp-dark-btn {
+            background: linear-gradient(180deg, #4b4b61 0%, #2b2b3b 100%);
+            border-top: 1.5px solid #787891;
+            border-left: 1.5px solid #787891;
+            border-right: 1.5px solid #111118;
+            border-bottom: 1.5px solid #111118;
+            color: #d8d8e6;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .winamp-dark-btn.led-on {
+            border-top: 1.5px solid #111118;
+            border-left: 1.5px solid #111118;
+            border-right: 1.5px solid #787891;
+            border-bottom: 1.5px solid #787891;
+            background: #1d1d28;
+            color: #00ff00;
+        }
+
+        input[type="range"].winamp-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #0d0d14;
+            border-top: 1px solid #000;
+            border-left: 1px solid #000;
+            border-right: 1px solid #555568;
+            border-bottom: 1px solid #555568;
+            height: 8px;
+            cursor: pointer;
+        }
+        input[type="range"].winamp-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 11px;
+            background: linear-gradient(180deg, #d8dce0 0%, #84888c 100%);
+            border-top: 1.5px solid #fff;
+            border-left: 1.5px solid #fff;
+            border-right: 1.5px solid #222;
+            border-bottom: 1.5px solid #222;
+            cursor: pointer;
+        }
+
+        @keyframes winampMarquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-110%); }
+        }
+        .winamp-marquee-text {
+            display: inline-block;
+            white-space: nowrap;
+            animation: winampMarquee 14s linear infinite;
+        }
     </style>
 </head>
 <body class="festive-bg text-stone-100 font-sans h-[100dvh] overflow-hidden flex flex-col select-none">
@@ -178,6 +301,12 @@
 
             <!-- Botones de Acción Rápida en Móvil/PC (nunca colisionan con el buscador) -->
             <div class="flex items-center gap-1.5 sm:gap-2 shrink-0 md:hidden">
+                <!-- Botón Conmutador Winamp '98 / Modo Noel (Móvil) -->
+                <button onclick="toggleAppSkin()" title="Cambiar entre Interfaz Navideña y Winamp 1998"
+                    class="skin-toggle-btn flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-gold-300 border border-gold-400/50 text-[10px] font-bold transition whitespace-nowrap shrink-0">
+                    <span>⚡ WINAMP '98</span>
+                </button>
+
                 <button onclick="document.getElementById('local-file-input').click()" 
                     title="Cargar MP3/WAV desde tu celular"
                     class="p-2 rounded-full bg-pine-800/90 hover:bg-pine-700 text-gold-400 border border-gold-500/25 transition shrink-0">
@@ -185,9 +314,9 @@
                 </button>
 
                 <button id="main-drive-btn-mob" onclick="handleOneTouchDriveClick()" 
-                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white shadow-lg shadow-crimson-600/25 text-[11px] font-semibold transition whitespace-nowrap shrink-0">
+                    class="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-gradient-to-r from-crimson-600 to-crimson-700 hover:from-crimson-500 hover:to-crimson-600 text-white shadow-lg shadow-crimson-600/25 text-[10px] font-semibold transition whitespace-nowrap shrink-0">
                     <i data-lucide="cloud" class="w-3.5 h-3.5 shrink-0"></i>
-                    <span class="drive-btn-label-text">Conectar Drive</span>
+                    <span class="drive-btn-label-text">Drive</span>
                 </button>
 
                 <button onclick="openDriveModal()" title="Ajustes de Google Drive"
@@ -211,6 +340,12 @@
 
         <!-- Botones de Acción Rápida en Escritorio (md y superior) -->
         <div class="hidden md:flex items-center gap-2 shrink-0">
+            <!-- Botón Conmutador Winamp '98 / Modo Noel (PC) -->
+            <button onclick="toggleAppSkin()" title="Cambiar entre Interfaz Navideña y Winamp 1998"
+                class="skin-toggle-btn flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-gold-300 border border-gold-400/50 text-xs font-bold transition whitespace-nowrap shrink-0 shadow-md">
+                <span>⚡ WINAMP '98</span>
+            </button>
+
             <button onclick="document.getElementById('local-file-input').click()" 
                 title="Cargar MP3/WAV desde tu celular o PC"
                 class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pine-800/80 hover:bg-pine-700 text-stone-200 border border-gold-500/20 text-xs font-medium transition shrink-0">
@@ -231,8 +366,239 @@
         </div>
     </header>
 
-    <!-- CONTENEDOR CENTRAL (Sidebar + Vista Principal + Panel Smart EQ) -->
-    <div class="relative z-10 flex-1 flex overflow-hidden">
+    <!-- =====================================================================
+         INTERFAZ 2: RACK CLÁSICO WINAMP v2.91 (1998) - OCULTO POR DEFECTO
+         ===================================================================== -->
+    <div id="winamp-skin-wrapper" class="hidden relative z-20 flex-1 overflow-y-auto p-2 sm:p-5 bg-[#121218]/95 flex-col items-center gap-2.5">
+        <div class="w-full max-w-[540px] flex flex-col gap-2 pb-8">
+
+            <!-- MÓDULO 1: WINAMP 2.91 MAIN WINDOW -->
+            <section class="winamp-window w-full">
+                <div class="winamp-titlebar">
+                    <span class="flex items-center gap-1.5">⚡ WINAMP 2.91</span>
+                    <span class="text-[9px] text-amber-200/80 hidden sm:inline">IT REALLY WHIPS THE LLAMA'S ASS!</span>
+                    <button onclick="toggleAppSkin()" class="px-1.5 bg-[#252533] text-[#00ff00] border border-[#6e6e85] text-[9px] hover:bg-black">
+                        🎄 VOLVER A NOEL
+                    </button>
+                </div>
+
+                <div class="p-2.5 sm:p-3 space-y-2.5">
+                    <!-- Pantalla LCD Matrix Verde + Marquesina + Info 128kbps 44kHz -->
+                    <div class="grid grid-cols-12 gap-2">
+                        <!-- Ventana LCD Izquierda: Reloj Digital + Mini Analizador con caída de picos -->
+                        <div class="col-span-5 sm:col-span-4 winamp-lcd p-2 flex flex-col justify-between h-[74px]">
+                            <div class="flex items-center justify-between">
+                                <span id="wa-play-state-led" class="text-[11px] text-[#00ff00] uppercase tracking-wider">► PLAY</span>
+                                <span id="wa-time-display" class="text-2xl sm:text-3xl leading-none font-bold tracking-widest text-[#00ff00]">00:00</span>
+                            </div>
+                            <canvas id="wa-lcd-canvas" class="w-full h-7 bg-black mt-1"></canvas>
+                        </div>
+
+                        <!-- Ventana LCD Derecha: Marquesina Deslizante + Bitrate + Stereo -->
+                        <div class="col-span-7 sm:col-span-8 flex flex-col justify-between gap-1.5">
+                            <div class="winamp-lcd px-2 py-1 overflow-hidden h-7 flex items-center">
+                                <div id="wa-marquee" class="winamp-marquee-text text-sm sm:text-base tracking-wide text-[#00ff00]">
+                                    *** 01. Selecciona una canción - NoelStream Drive (128kbps / 44kHz) ***
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-1.5">
+                                <div class="flex items-center gap-1">
+                                    <span class="winamp-lcd px-1.5 py-0.5 text-xs text-[#00ff00]">128</span>
+                                    <span class="text-[9px] text-stone-300 font-bold">kbps</span>
+                                    <span class="winamp-lcd px-1.5 py-0.5 text-xs text-[#00ff00] ml-1">44</span>
+                                    <span class="text-[9px] text-stone-300 font-bold">kHz</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[9px] px-1.5 py-0.5 bg-black border border-[#4d4d63] text-stone-500 font-bold">MONO</span>
+                                    <span class="text-[9px] px-1.5 py-0.5 bg-black border border-[#00ff00]/60 text-[#00ff00] font-bold shadow-[0_0_6px_rgba(0,255,0,0.4)]">STEREO</span>
+                                </div>
+                            </div>
+
+                            <!-- Control de Volumen estilo Winamp -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-bold text-stone-300 uppercase w-12">VOLUMEN</span>
+                                <input id="wa-volume-slider" type="range" min="0" max="1" step="0.02" value="0.85"
+                                    oninput="setVolume(this.value)" class="winamp-slider flex-1">
+                                <span id="wa-eq-badge" class="text-[9px] font-mono text-[#00ff00] bg-black px-1.5 py-0.5 border border-[#4d4d63] truncate max-w-[115px]">
+                                    AUTO-EQ ON
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barra de Progreso (Seek Bar) estilo Winamp -->
+                    <div class="pt-0.5">
+                        <input id="wa-seek-bar" type="range" min="0" max="100" value="0" step="0.1"
+                            oninput="onSeekInput(this.value)" onchange="onSeekCommit(this.value)"
+                            class="winamp-slider w-full">
+                    </div>
+
+                    <!-- Botonera Metálica Biselada de Transporte (Los 7 controles + Stop + Fav) -->
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 pt-1">
+                        <div class="flex items-center gap-1">
+                            <button onclick="prevTrack()" class="winamp-btn px-2.5 py-1.5" title="Anterior">
+                                ⏮
+                            </button>
+                            <button onclick="skipSeconds(-10)" class="winamp-btn px-2 py-1.5" title="Retroceder 10s">
+                                -10s
+                            </button>
+                            <button onclick="togglePlayPause()" id="wa-btn-play" class="winamp-btn px-3 py-1.5" title="Reproducir / Pausar">
+                                ► / ❚❚
+                            </button>
+                            <button onclick="stopAudioWinamp()" class="winamp-btn px-2.5 py-1.5" title="Detener">
+                                ■
+                            </button>
+                            <button onclick="skipSeconds(10)" class="winamp-btn px-2 py-1.5" title="Adelantar 10s">
+                                +10s
+                            </button>
+                            <button onclick="nextTrack()" class="winamp-btn px-2.5 py-1.5" title="Siguiente">
+                                ⏭
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-1">
+                            <button id="wa-btn-shuffle" onclick="toggleShuffle()" class="winamp-dark-btn px-2.5 py-1 flex items-center gap-1">
+                                <span id="wa-led-shuffle" class="w-1.5 h-1.5 rounded-full bg-stone-600"></span>
+                                <span>SHUFFLE</span>
+                            </button>
+                            <button id="wa-btn-repeat" onclick="toggleRepeat()" class="winamp-dark-btn px-2.5 py-1 flex items-center gap-1">
+                                <span id="wa-led-repeat" class="w-1.5 h-1.5 rounded-full bg-stone-600"></span>
+                                <span id="wa-label-repeat">REPEAT</span>
+                            </button>
+                            <button onclick="toggleFavoriteCurrent()" class="winamp-dark-btn px-2 py-1 text-rose-400" title="Favorito">
+                                ♥
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MÓDULO 2: WINAMP GRAPHICAL EQUALIZER (CON CURVA SPLINE EN VIVO Y BOTÓN AUTO) -->
+            <section class="winamp-window w-full">
+                <div class="winamp-titlebar">
+                    <span>🎚️ WINAMP GRAPHICAL EQUALIZER</span>
+                    <span id="wa-genre-detected" class="text-[9px] text-[#00ff00] font-mono">PERFIL: CORAL</span>
+                </div>
+
+                <div class="p-2.5 sm:p-3 space-y-2.5">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <button id="wa-eq-on-btn" onclick="toggleSmartEQ()" class="winamp-dark-btn led-on px-2.5 py-1 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-[#00ff00]"></span>
+                                <span>ON</span>
+                            </button>
+                            <button id="wa-eq-auto-btn" onclick="toggleSmartEQ()" class="winamp-dark-btn led-on px-2.5 py-1 flex items-center gap-1.5" title="Activar/Desactivar Smart Auto-EQ">
+                                <span id="wa-eq-auto-led" class="w-2 h-2 rounded-full bg-[#00ff00]"></span>
+                                <span>AUTO (SMART AI)</span>
+                            </button>
+                        </div>
+
+                        <!-- Pantalla Spline de Curva EQ estilo Winamp -->
+                        <div class="winamp-lcd px-2 py-1 flex items-center gap-2 flex-1 min-w-[160px] h-9">
+                            <span class="text-[10px] text-amber-400 font-mono shrink-0">+12dB<br>-12dB</span>
+                            <canvas id="wa-spline-canvas" class="w-full h-7 bg-black"></canvas>
+                        </div>
+
+                        <select id="wa-preset-select" onchange="applyManualPreset(this.value)"
+                            class="bg-black text-[#00ff00] border border-[#57576b] px-2 py-1 text-[11px] font-mono focus:outline-none">
+                            <option value="auto">PRESET: AUTO SMART</option>
+                            <option value="coral">PRESET: CORAL</option>
+                            <option value="jazz">PRESET: JAZZ</option>
+                            <option value="acustico">PRESET: ACÚSTICO</option>
+                            <option value="pop">PRESET: POP BASS</option>
+                            <option value="flat">PRESET: FLAT 0dB</option>
+                        </select>
+                    </div>
+
+                    <!-- 5 Bandas de Frecuencia con Indicadores LED Verdes -->
+                    <div class="grid grid-cols-5 gap-2 pt-1 bg-[#1b1b26] p-2 border border-[#111118]">
+                        <div class="flex flex-col items-center gap-1">
+                            <span id="wa-val-band-0" class="text-[10px] font-mono text-[#00ff00]">+0.0</span>
+                            <input id="wa-slider-band-0" type="range" min="-12" max="12" step="0.5" value="0"
+                                oninput="onManualSliderInput(0, this.value)" class="winamp-slider w-full">
+                            <span class="text-[9px] font-bold text-stone-300">60Hz</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <span id="wa-val-band-1" class="text-[10px] font-mono text-[#00ff00]">+0.0</span>
+                            <input id="wa-slider-band-1" type="range" min="-12" max="12" step="0.5" value="0"
+                                oninput="onManualSliderInput(1, this.value)" class="winamp-slider w-full">
+                            <span class="text-[9px] font-bold text-stone-300">250Hz</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <span id="wa-val-band-2" class="text-[10px] font-mono text-[#00ff00]">+0.0</span>
+                            <input id="wa-slider-band-2" type="range" min="-12" max="12" step="0.5" value="0"
+                                oninput="onManualSliderInput(2, this.value)" class="winamp-slider w-full">
+                            <span class="text-[9px] font-bold text-stone-300">1kHz</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <span id="wa-val-band-3" class="text-[10px] font-mono text-[#00ff00]">+0.0</span>
+                            <input id="wa-slider-band-3" type="range" min="-12" max="12" step="0.5" value="0"
+                                oninput="onManualSliderInput(3, this.value)" class="winamp-slider w-full">
+                            <span class="text-[9px] font-bold text-stone-300">4kHz</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <span id="wa-val-band-4" class="text-[10px] font-mono text-[#00ff00]">+0.0</span>
+                            <input id="wa-slider-band-4" type="range" min="-12" max="12" step="0.5" value="0"
+                                oninput="onManualSliderInput(4, this.value)" class="winamp-slider w-full">
+                            <span class="text-[9px] font-bold text-stone-300">12kHz</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MÓDULO 3: WINAMP PLAYLIST EDITOR (NEGRO PURO #000000 Y LETRAS VERDES #00FF00) -->
+            <section class="winamp-window w-full flex flex-col">
+                <div class="winamp-titlebar">
+                    <span>📜 WINAMP PLAYLIST EDITOR</span>
+                    <span id="wa-playlist-count" class="text-[9px] text-[#00ff00] font-mono">0 TRACKS</span>
+                </div>
+
+                <div class="p-2.5 space-y-2">
+                    <!-- Filtros de Vista y Subcarpetas dentro del Playlist Editor -->
+                    <div class="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1">
+                        <button onclick="switchView('all')" id="wa-tab-all" class="winamp-dark-btn led-on px-2.5 py-1 whitespace-nowrap">
+                            TODAS LAS PISTAS
+                        </button>
+                        <button onclick="switchView('folders', null)" id="wa-tab-folders" class="winamp-dark-btn px-2.5 py-1 whitespace-nowrap">
+                            ÁLBUMES DRIVE
+                        </button>
+                        <button onclick="switchView('favorites')" id="wa-tab-favorites" class="winamp-dark-btn px-2.5 py-1 whitespace-nowrap">
+                            ♥ FAVORITOS
+                        </button>
+                        <button onclick="openNewPlaylistModal()" class="winamp-dark-btn px-2.5 py-1 whitespace-nowrap text-amber-300">
+                            + NUEVA LISTA
+                        </button>
+                    </div>
+
+                    <!-- Pantalla Negra de Lista de Canciones -->
+                    <div id="wa-playlist-box" class="winamp-lcd h-64 sm:h-72 overflow-y-auto p-2 space-y-0.5 text-sm sm:text-base select-none"></div>
+
+                    <!-- Barra Inferior de Comandos del Playlist Editor -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="handleOneTouchDriveClick()" class="winamp-btn px-2.5 py-1">
+                                ☁ SYNC DRIVE
+                            </button>
+                            <button onclick="document.getElementById('local-file-input').click()" class="winamp-btn px-2.5 py-1">
+                                + ADD MP3
+                            </button>
+                            <button onclick="playAllCurrentView()" class="winamp-btn px-2.5 py-1">
+                                ► PLAY LIST
+                            </button>
+                        </div>
+                        <span class="text-[10px] font-mono text-[#00ff00] bg-black px-2 py-0.5 border border-[#4d4d63]">
+                            DRIVE STREAMING READY
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- CONTENEDOR CENTRAL NAVIDEÑO (Sidebar + Vista Principal + Panel Smart EQ) -->
+    <div id="noel-main-wrapper" class="relative z-10 flex-1 flex overflow-hidden">
         
         <!-- BARRA LATERAL IZQUIERDA (Navegación PC) -->
         <aside class="hidden lg:flex flex-col w-64 glass-panel border-r border-gold-500/15 p-4 shrink-0 justify-between overflow-y-auto">
@@ -480,8 +846,8 @@
         </aside>
     </div>
 
-    <!-- BARRA INFERIOR DE REPRODUCCIÓN (Adaptada al 100% para Celular y PC con todos los 7 botones visibles) -->
-    <footer class="relative z-30 glass-panel border-t border-gold-500/30 px-3 sm:px-6 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+10px)] sm:py-3 shrink-0 shadow-2xl">
+    <!-- BARRA INFERIOR DE REPRODUCCIÓN NAVIDEÑA (Adaptada al 100% para Celular y PC con todos los 7 botones visibles) -->
+    <footer id="noel-footer-player" class="relative z-30 glass-panel border-t border-gold-500/30 px-3 sm:px-6 pt-2 pb-[calc(env(safe-area-inset-bottom,0px)+10px)] sm:py-3 shrink-0 shadow-2xl">
         
         <!-- Fila 1 (Solo en Móvil): Mini Info de la Canción Actual + Botón Favorito y Smart EQ -->
         <div class="flex sm:hidden items-center justify-between gap-2 mb-1.5 px-1">
@@ -847,6 +1213,7 @@
          * 2. ESTADO GLOBAL Y GESTIÓN DE MEMORIA / CACHÉ
          ***********************************************************************/
         let state = {
+            appSkin: localStorage.getItem('noel_app_skin') || 'noel',
             currentView: 'all',
             selectedFolder: null,
             selectedPlaylistId: null,
@@ -1069,10 +1436,20 @@
                 const mobLabel = document.getElementById(`mob-val-band-${idx}`);
                 if (mobSlider) mobSlider.value = gainVal;
                 if (mobLabel) mobLabel.textContent = `${gainVal >= 0 ? '+' : ''}${gainVal.toFixed(1)} dB`;
+
+                // Sincronizar también los 5 sliders del Ecualizador Gráfico de Winamp '98
+                const waSlider = document.getElementById(`wa-slider-band-${idx}`);
+                const waLabel = document.getElementById(`wa-val-band-${idx}`);
+                if (waSlider) waSlider.value = gainVal;
+                if (waLabel) waLabel.textContent = `${gainVal >= 0 ? '+' : ''}${gainVal.toFixed(1)}`;
             });
+
+            drawWinampSplineCurve();
         }
 
         let lastSmartAdjustTime = 0;
+        let winampPeakHold = new Array(20).fill(0);
+
         function renderSpectrumAndSmartEQ(timestamp) {
             requestAnimationFrame(renderSpectrumAndSmartEQ);
 
@@ -1081,6 +1458,7 @@
 
             drawCanvasSpectrum('spectrum-canvas');
             drawCanvasSpectrum('mob-spectrum-canvas');
+            drawWinampLCDSpectrum();
 
             if (state.smartEqEnabled && state.isPlaying && timestamp - lastSmartAdjustTime > 450) {
                 lastSmartAdjustTime = timestamp;
@@ -1150,6 +1528,163 @@
             }
         }
 
+        // Analizador clásico de Winamp 1998 con caída de picos blancos/verdes en la pantalla LCD
+        function drawWinampLCDSpectrum() {
+            const canvas = document.getElementById('wa-lcd-canvas');
+            if (!canvas || !frequencyData) return;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.clientWidth || 140;
+            const height = canvas.height = canvas.clientHeight || 28;
+
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, width, height);
+
+            // Cuadrícula de puntos verdes oscuros estilo matriz
+            ctx.fillStyle = 'rgba(0, 90, 0, 0.35)';
+            for (let gx = 0; gx < width; gx += 4) {
+                for (let gy = 0; gy < height; gy += 4) {
+                    ctx.fillRect(gx, gy, 1, 1);
+                }
+            }
+
+            const numBars = 18;
+            const step = Math.floor(frequencyData.length / numBars);
+            const barWidth = Math.max(3, Math.floor((width / numBars) - 2));
+
+            for (let i = 0; i < numBars; i++) {
+                const val = frequencyData[i * step] || 0;
+                const h = Math.floor((val / 255) * (height - 2));
+                const x = i * (barWidth + 2);
+                const y = height - h;
+
+                if (h > winampPeakHold[i]) {
+                    winampPeakHold[i] = h;
+                } else {
+                    winampPeakHold[i] = Math.max(0, winampPeakHold[i] - 0.35);
+                }
+
+                const grad = ctx.createLinearGradient(0, height, 0, 0);
+                grad.addColorStop(0, '#00cc00');
+                grad.addColorStop(0.65, '#d4ff00');
+                grad.addColorStop(1, '#ff2a00');
+
+                ctx.fillStyle = grad;
+                ctx.fillRect(x, y, barWidth, h);
+
+                // Pico flotante clásico de Winamp
+                const peakY = height - Math.floor(winampPeakHold[i]) - 2;
+                if (peakY >= 0 && peakY < height - 1) {
+                    ctx.fillStyle = '#e0ffe0';
+                    ctx.fillRect(x, peakY, barWidth, 1.5);
+                }
+            }
+        }
+
+        // Dibuja la curva spline en vivo del Ecualizador Gráfico de Winamp '98
+        function drawWinampSplineCurve() {
+            const canvas = document.getElementById('wa-spline-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.clientWidth || 150;
+            const height = canvas.height = canvas.clientHeight || 28;
+
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, width, height);
+
+            // Línea central 0 dB
+            ctx.strokeStyle = '#2b3d2b';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, height / 2);
+            ctx.lineTo(width, height / 2);
+            ctx.stroke();
+
+            // Puntos de las 5 bandas (-12dB a +12dB)
+            const points = state.bandGains.map((gain, idx) => {
+                const x = (idx / (state.bandGains.length - 1)) * (width - 12) + 6;
+                const normalized = (gain + 12) / 24;
+                const y = height - (normalized * (height - 6)) - 3;
+                return { x, y };
+            });
+
+            const grad = ctx.createLinearGradient(0, height, 0, 0);
+            grad.addColorStop(0, '#00ff00');
+            grad.addColorStop(0.5, '#ffcc00');
+            grad.addColorStop(1, '#ff2200');
+
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            points.forEach((pt, idx) => {
+                if (idx === 0) {
+                    ctx.moveTo(pt.x, pt.y);
+                } else {
+                    const prev = points[idx - 1];
+                    const cx = (prev.x + pt.x) / 2;
+                    ctx.quadraticCurveTo(prev.x, prev.y, cx, (prev.y + pt.y) / 2);
+                    if (idx === points.length - 1) {
+                        ctx.lineTo(pt.x, pt.y);
+                    }
+                }
+            });
+            ctx.stroke();
+        }
+
+        // Conmutador en tiempo real entre Modo Navideño y Modo Winamp 1998
+        function toggleAppSkin() {
+            state.appSkin = state.appSkin === 'noel' ? 'winamp' : 'noel';
+            try {
+                localStorage.setItem('noel_app_skin', state.appSkin);
+            } catch (e) {}
+            applyAppSkinUI();
+            showToast(
+                state.appSkin === 'winamp'
+                    ? "⚡ Modo Winamp '98 activado — It really whips the llama's ass!"
+                    : "🎄 Modo Navideño NoelStream activado",
+                'success'
+            );
+        }
+
+        function applyAppSkinUI() {
+            const winampWrapper = document.getElementById('winamp-skin-wrapper');
+            const noelWrapper = document.getElementById('noel-main-wrapper');
+            const noelFooter = document.getElementById('noel-footer-player');
+            const toggleBtns = document.querySelectorAll('.skin-toggle-btn');
+
+            if (state.appSkin === 'winamp') {
+                winampWrapper.classList.remove('hidden');
+                winampWrapper.classList.add('flex');
+                noelWrapper.classList.add('hidden');
+                noelFooter.classList.add('hidden');
+                toggleBtns.forEach(btn => {
+                    btn.innerHTML = '<span>🎄 MODO NOEL</span>';
+                    btn.className = 'skin-toggle-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/25 hover:bg-emerald-500/35 text-emerald-300 border border-emerald-400/60 text-[10px] sm:text-xs font-bold transition whitespace-nowrap shrink-0 shadow-md';
+                });
+                drawWinampSplineCurve();
+                renderMainContent();
+                updatePlayerBarUI();
+            } else {
+                winampWrapper.classList.add('hidden');
+                winampWrapper.classList.remove('flex');
+                noelWrapper.classList.remove('hidden');
+                noelFooter.classList.remove('hidden');
+                toggleBtns.forEach(btn => {
+                    btn.innerHTML = "<span>⚡ WINAMP '98</span>";
+                    btn.className = 'skin-toggle-btn flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-gold-300 border border-gold-400/50 text-[10px] sm:text-xs font-bold transition whitespace-nowrap shrink-0 shadow-md';
+                });
+                renderMainContent();
+                updatePlayerBarUI();
+            }
+        }
+
+        function stopAudioWinamp() {
+            audioEl.pause();
+            audioEl.currentTime = 0;
+            state.isPlaying = false;
+            updatePlayerBarUI();
+            renderMainContent();
+        }
+
         function detectTrackGenreByMetadata(title, album) {
             const text = `${title} ${album}`.toLowerCase();
             if (text.includes('jazz') || text.includes('swing') || text.includes('sax') || text.includes('blues') || text.includes('buble') || text.includes('sinatra')) {
@@ -1198,6 +1733,22 @@
                 statusBadge.innerHTML = `Manual / Fijo`;
                 statusBadge.className = 'text-stone-400 font-medium';
             }
+
+            // Sincronizar botón AUTO del ecualizador de Winamp '98
+            const waAutoBtn = document.getElementById('wa-eq-auto-btn');
+            const waAutoLed = document.getElementById('wa-eq-auto-led');
+            const waEqBadge = document.getElementById('wa-eq-badge');
+            if (waAutoBtn && waAutoLed) {
+                if (state.smartEqEnabled) {
+                    waAutoBtn.classList.add('led-on');
+                    waAutoLed.className = 'w-2 h-2 rounded-full bg-[#00ff00]';
+                    if (waEqBadge) waEqBadge.textContent = 'AUTO-EQ ON';
+                } else {
+                    waAutoBtn.classList.remove('led-on');
+                    waAutoLed.className = 'w-2 h-2 rounded-full bg-stone-600';
+                    if (waEqBadge) waEqBadge.textContent = 'MANUAL EQ';
+                }
+            }
         }
 
         function applySmartProfileForTrack(track) {
@@ -1208,6 +1759,9 @@
             document.getElementById('player-eq-pill').textContent = pillText;
             const mobPill = document.getElementById('player-eq-pill-mob');
             if (mobPill) mobPill.textContent = pillText;
+
+            const waGenre = document.getElementById('wa-genre-detected');
+            if (waGenre) waGenre.textContent = `PERFIL: ${profile.name.toUpperCase()}`;
 
             if (state.smartEqEnabled) {
                 updateFilterGainsUIAndAudio(profile.gains, true);
@@ -1414,7 +1968,53 @@
             btn.className = state.isShuffle
                 ? 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition inline-flex items-center justify-center shrink-0'
                 : 'p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition inline-flex items-center justify-center shrink-0';
+
+            const waBtnShuffle = document.getElementById('wa-btn-shuffle');
+            const waLedShuffle = document.getElementById('wa-led-shuffle');
+            if (waBtnShuffle && waLedShuffle) {
+                waBtnShuffle.classList.toggle('led-on', state.isShuffle);
+                waLedShuffle.className = state.isShuffle ? 'w-1.5 h-1.5 rounded-full bg-[#00ff00]' : 'w-1.5 h-1.5 rounded-full bg-stone-600';
+            }
+
             showToast(state.isShuffle ? 'Modo Aleatorio activado' : 'Modo Aleatorio desactivado', 'info');
+        }
+
+        function toggleRepeat() {
+            const modes = ['none', 'all', 'one'];
+            const next = modes[(modes.indexOf(state.repeatMode) + 1) % modes.length];
+            state.repeatMode = next;
+
+            const btn = document.getElementById('btn-repeat');
+            const badge = document.getElementById('repeat-one-badge');
+
+            if (next === 'none') {
+                btn.className = 'p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative inline-flex items-center justify-center shrink-0';
+                badge.classList.add('hidden');
+            } else if (next === 'all') {
+                btn.className = 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative inline-flex items-center justify-center shrink-0';
+                badge.classList.add('hidden');
+            } else {
+                btn.className = 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative inline-flex items-center justify-center shrink-0';
+                badge.classList.remove('hidden');
+            }
+
+            const waBtnRepeat = document.getElementById('wa-btn-repeat');
+            const waLedRepeat = document.getElementById('wa-led-repeat');
+            const waLabelRepeat = document.getElementById('wa-label-repeat');
+            if (waBtnRepeat && waLedRepeat && waLabelRepeat) {
+                waBtnRepeat.classList.toggle('led-on', next !== 'none');
+                waLedRepeat.className = next !== 'none' ? 'w-1.5 h-1.5 rounded-full bg-[#00ff00]' : 'w-1.5 h-1.5 rounded-full bg-stone-600';
+                waLabelRepeat.textContent = next === 'one' ? 'REP 1' : 'REPEAT';
+            }
+        }
+
+        function setVolume(val) {
+            audioEl.volume = parseFloat(val);
+            audioEl.muted = (val == 0);
+            const v1 = document.getElementById('volume-slider');
+            const v2 = document.getElementById('wa-volume-slider');
+            if (v1) v1.value = val;
+            if (v2) v2.value = val;
         }
 
         function toggleRepeat() {
@@ -1478,6 +2078,16 @@
             document.getElementById('current-time').textContent = formatSeconds(audioEl.currentTime);
             document.getElementById('total-duration').textContent = formatSeconds(audioEl.duration);
 
+            // Actualizar también el reloj digital LCD y barra de Winamp '98
+            const waSeek = document.getElementById('wa-seek-bar');
+            const waTime = document.getElementById('wa-time-display');
+            if (waSeek) waSeek.value = percent;
+            if (waTime) {
+                const m = Math.floor(audioEl.currentTime / 60);
+                const s = Math.floor(audioEl.currentTime % 60);
+                waTime.textContent = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+            }
+
             if ('mediaSession' in navigator && navigator.mediaSession.setPositionState) {
                 try {
                     navigator.mediaSession.setPositionState({
@@ -1532,6 +2142,18 @@
                 if (mobTitle) mobTitle.textContent = track.title;
                 if (mobArtist) mobArtist.textContent = track.album;
                 if (mobCover) mobCover.textContent = track.coverEmoji || '🎄';
+
+                // Actualizar marquesina LCD de Winamp '98
+                const waMarquee = document.getElementById('wa-marquee');
+                if (waMarquee) {
+                    const numStr = (state.currentTrackIndex + 1) < 10 ? `0${state.currentTrackIndex + 1}` : `${state.currentTrackIndex + 1}`;
+                    waMarquee.textContent = `*** ${numStr}. ${track.title} - ${track.album} (128kbps / 44kHz) ***`;
+                }
+            }
+
+            const waPlayLed = document.getElementById('wa-play-state-led');
+            if (waPlayLed) {
+                waPlayLed.textContent = state.isPlaying ? '► PLAY' : '❚❚ PAUSE';
             }
 
             const btnPlay = document.getElementById('btn-play-pause');
@@ -1577,58 +2199,86 @@
             renderMainContent();
         }
 
-        function getFilteredTracks() {
-            const q = state.searchQuery.trim().toLowerCase();
-            let list = [...state.tracks];
+        // Renderiza el Playlist Editor estilo Winamp '98 (#000000 y letras #00ff00)
+        function renderWinampPlaylistEditor() {
+            const box = document.getElementById('wa-playlist-box');
+            const countLabel = document.getElementById('wa-playlist-count');
+            if (!box) return;
 
-            if (state.currentView === 'favorites') {
-                list = list.filter(t => state.favorites.includes(t.id));
-            } else if (state.currentView === 'folders' && state.selectedFolder) {
-                list = list.filter(t => t.album === state.selectedFolder);
-            } else if (state.currentView === 'playlists' && state.selectedPlaylistId) {
-                const pl = state.playlists.find(p => p.id === state.selectedPlaylistId);
-                if (pl) {
-                    list = list.filter(t => pl.trackIds.includes(t.id));
-                }
+            ['all', 'folders', 'favorites'].forEach(tab => {
+                const btn = document.getElementById(`wa-tab-${tab}`);
+                if (btn) btn.classList.toggle('led-on', state.currentView === tab);
+            });
+
+            // Si está en vista de subcarpetas/álbumes sin carpeta seleccionada
+            if (state.currentView === 'folders' && !state.selectedFolder) {
+                const albumsMap = {};
+                state.tracks.forEach(t => {
+                    if (!albumsMap[t.album]) albumsMap[t.album] = 0;
+                    albumsMap[t.album]++;
+                });
+                const albums = Object.keys(albumsMap);
+                if (countLabel) countLabel.textContent = `${albums.length} ALBUMS`;
+
+                box.innerHTML = albums.map((albName, idx) => `
+                    <div onclick="switchView('folders', '${albName.replace(/'/g, "\\'")}')"
+                         class="px-2 py-1 cursor-pointer hover:bg-[#003300] text-[#00ff00] flex items-center justify-between font-lcd text-base">
+                        <span class="truncate">📁 [${idx + 1}] ${albName}</span>
+                        <span class="text-xs ml-2 shrink-0">(${albumsMap[albName]} pistas)</span>
+                    </div>
+                `).join('');
+                return;
             }
 
-            if (q) {
-                list = list.filter(t =>
-                    t.title.toLowerCase().includes(q) ||
-                    t.artist.toLowerCase().includes(q) ||
-                    t.album.toLowerCase().includes(q)
-                );
-            }
-            return list;
-        }
+            const tracks = getFilteredTracks();
+            if (countLabel) countLabel.textContent = `${tracks.length} TRACKS`;
 
-        function renderSidebarPlaylists() {
-            const container = document.getElementById('sidebar-playlists');
-            const albums = [...new Set(state.tracks.map(t => t.album))];
+            const backFolderHeader = (state.currentView === 'folders' && state.selectedFolder) ? `
+                <div onclick="switchView('folders', null)" class="px-2 py-1 mb-1 bg-[#1b2845] text-amber-300 cursor-pointer font-mono text-xs flex items-center justify-between">
+                    <span>⬅ VOLVER A ÁLBUMES (${state.selectedFolder})</span>
+                    <span>[ESC]</span>
+                </div>
+            ` : '';
 
-            document.getElementById('count-all').textContent = state.tracks.length;
-            document.getElementById('count-folders').textContent = albums.length;
-            document.getElementById('count-favorites').textContent = state.favorites.length;
-
-            container.innerHTML = state.playlists.map(pl => {
-                const isActive = state.currentView === 'playlists' && state.selectedPlaylistId === pl.id;
-                return `
-                    <div class="group flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition cursor-pointer ${isActive ? 'bg-gold-500/15 text-gold-300 border border-gold-500/30' : 'text-stone-300 hover:bg-pine-800/50'}"
-                         onclick="switchView('playlists', '${pl.id}')">
-                        <span class="truncate pr-2">${pl.name}</span>
-                        <div class="flex items-center gap-1">
-                            <span class="text-[10px] text-stone-400">${pl.trackIds.length}</span>
-                            <button onclick="event.stopPropagation(); deletePlaylist('${pl.id}')" class="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-crimson-500 p-0.5">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
+            if (tracks.length === 0) {
+                box.innerHTML = `
+                    ${backFolderHeader}
+                    <div class="p-4 text-center text-[#00ff00] font-lcd text-lg">
+                        *** SIN PISTAS EN ESTA VISTA — TOCA "SYNC DRIVE" ***
                     </div>
                 `;
-            }).join('');
-            lucide.createIcons();
+                return;
+            }
+
+            box.innerHTML = `
+                ${backFolderHeader}
+                ${tracks.map((track, idx) => {
+                    const globalIdx = state.tracks.findIndex(t => t.id === track.id);
+                    const isCurrent = globalIdx === state.currentTrackIndex;
+                    const isFav = state.favorites.includes(track.id);
+                    const num = (idx + 1) < 10 ? `0${idx + 1}` : `${idx + 1}`;
+                    const dur = track.duration ? formatSeconds(track.duration) : 'DRIVE';
+
+                    return `
+                        <div onclick="playTrackByIndex(${globalIdx})"
+                             class="px-2 py-0.5 cursor-pointer flex items-center justify-between gap-2 font-lcd text-base sm:text-lg leading-tight ${isCurrent ? 'bg-[#002b7f] text-white font-bold' : 'text-[#00ff00] hover:bg-[#002200]'}">
+                            <div class="truncate flex-1">
+                                <span>${num}. ${track.title}</span>
+                                <span class="text-xs opacity-75 ml-1">[${track.album}]</span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0" onclick="event.stopPropagation()">
+                                <button onclick="toggleFavorite('${track.id}')" class="text-xs ${isFav ? 'text-rose-400' : 'text-stone-500 hover:text-[#00ff00]'}">♥</button>
+                                <button onclick="openAddToPlaylistModal('${track.id}')" class="text-xs text-stone-400 hover:text-[#00ff00]">+</button>
+                                <span class="text-sm font-mono">${dur}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            `;
         }
 
         function renderMainContent() {
+            renderWinampPlaylistEditor();
             const area = document.getElementById('main-scroll-area');
             const titleEl = document.getElementById('view-title');
             const subEl = document.getElementById('view-subtitle');
@@ -2257,6 +2907,7 @@
         window.onload = function () {
             createFestiveSnowflakes();
             loadInitialState();
+            applyAppSkinUI();
             renderSidebarPlaylists();
             renderMainContent();
             syncSmartEQUi();
