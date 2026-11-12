@@ -2017,34 +2017,13 @@
             if (v2) v2.value = val;
         }
 
-        function toggleRepeat() {
-            const modes = ['none', 'all', 'one'];
-            const next = modes[(modes.indexOf(state.repeatMode) + 1) % modes.length];
-            state.repeatMode = next;
-
-            const btn = document.getElementById('btn-repeat');
-            const badge = document.getElementById('repeat-one-badge');
-
-            if (next === 'none') {
-                btn.className = 'p-2 rounded-full text-stone-400 hover:text-stone-100 hover:bg-white/5 transition relative inline-flex items-center justify-center shrink-0';
-                badge.classList.add('hidden');
-            } else if (next === 'all') {
-                btn.className = 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative inline-flex items-center justify-center shrink-0';
-                badge.classList.add('hidden');
-            } else {
-                btn.className = 'p-2 rounded-full text-gold-400 bg-gold-500/15 border border-gold-500/30 transition relative inline-flex items-center justify-center shrink-0';
-                badge.classList.remove('hidden');
-            }
-        }
-
-        function setVolume(val) {
-            audioEl.volume = parseFloat(val);
-            audioEl.muted = (val == 0);
-        }
-
         function toggleMute() {
             audioEl.muted = !audioEl.muted;
-            document.getElementById('volume-slider').value = audioEl.muted ? 0 : audioEl.volume;
+            const volVal = audioEl.muted ? 0 : audioEl.volume;
+            const v1 = document.getElementById('volume-slider');
+            const v2 = document.getElementById('wa-volume-slider');
+            if (v1) v1.value = volVal;
+            if (v2) v2.value = volVal;
         }
 
         function onSeekInput(percent) {
@@ -2167,6 +2146,70 @@
         /***********************************************************************
          * 5. VISTAS DE BIBLIOTECA, SUBCARPETAS Y LISTAS DE REPRODUCCIÓN
          ***********************************************************************/
+        function getFilteredTracks() {
+            let list = [...state.tracks];
+
+            if (state.currentView === 'favorites') {
+                list = list.filter(t => state.favorites.includes(t.id));
+            } else if (state.currentView === 'folders' && state.selectedFolder) {
+                list = list.filter(t => t.album === state.selectedFolder);
+            } else if (state.currentView === 'playlists' && state.selectedPlaylistId) {
+                const pl = state.playlists.find(p => p.id === state.selectedPlaylistId);
+                if (pl) {
+                    list = list.filter(t => pl.trackIds.includes(t.id));
+                } else {
+                    list = [];
+                }
+            }
+
+            if (state.searchQuery && state.searchQuery.trim() !== '') {
+                const q = state.searchQuery.toLowerCase().trim();
+                list = list.filter(t =>
+                    (t.title && t.title.toLowerCase().includes(q)) ||
+                    (t.album && t.album.toLowerCase().includes(q)) ||
+                    (t.artist && t.artist.toLowerCase().includes(q)) ||
+                    (t.genreLabel && t.genreLabel.toLowerCase().includes(q))
+                );
+            }
+
+            return list;
+        }
+
+        function renderSidebarPlaylists() {
+            const countAllEl = document.getElementById('count-all');
+            const countFoldersEl = document.getElementById('count-folders');
+            const countFavsEl = document.getElementById('count-favorites');
+
+            if (countAllEl) countAllEl.textContent = state.tracks.length;
+            if (countFoldersEl) {
+                const uniqueAlbums = new Set(state.tracks.map(t => t.album)).size;
+                countFoldersEl.textContent = uniqueAlbums;
+            }
+            if (countFavsEl) countFavsEl.textContent = state.favorites.length;
+
+            const container = document.getElementById('sidebar-playlists');
+            if (!container) return;
+
+            container.innerHTML = state.playlists.map(pl => {
+                const isActive = state.currentView === 'playlists' && state.selectedPlaylistId === pl.id;
+                return `
+                    <div class="group flex items-center justify-between rounded-xl px-3 py-2 text-xs transition cursor-pointer ${isActive ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30 font-semibold' : 'text-stone-300 hover:bg-pine-800/50'}"
+                         onclick="switchView('playlists', '${pl.id}')">
+                        <span class="truncate pr-2">${pl.name}</span>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span class="text-[10px] text-stone-400">${pl.trackIds.length}</span>
+                            <button onclick="event.stopPropagation(); deletePlaylist('${pl.id}')" title="Eliminar lista"
+                                class="opacity-0 group-hover:opacity-100 text-stone-400 hover:text-crimson-500 transition p-0.5">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
         function switchView(viewName, folderOrPlaylistId = null) {
             state.currentView = viewName;
             if (viewName === 'folders') {
